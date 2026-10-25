@@ -108,6 +108,7 @@ main { max-width: 680px; margin: 0 auto; padding: 16px 16px 48px; }
 .focus-card { background: var(--orange-soft); box-shadow: none; border: 2px solid #FED7AA; }
 .focus-card h1 { font-size: 28px; font-weight: 900; }
 .fixes { margin: 6px 0 14px; font-size: 18px; color: var(--ink-2); }
+.next-focus { margin: 12px 0 0; font-size: 18px; color: var(--ink-2); text-align: center; }
 .need { background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 16px; }
 .need-title { margin: 0 0 6px; font-weight: 900; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); }
 .need ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 700; font-size: 17px; }
@@ -218,6 +219,7 @@ main { max-width: 680px; margin: 0 auto; padding: 16px 16px 48px; }
 .timer-btns .btn-big.btn-go { background: var(--green); box-shadow: 0 4px 0 var(--green-dark); }
 .btn-plus { background: var(--orange-soft); color: var(--orange-dark); min-height: 64px; border-radius: 18px; }
 .btn-sound { width: 100%; margin-bottom: 12px; background: var(--yellow); color: var(--ink); border: 2px solid #FCD34D; }
+.run-hint { margin: 12px 0 0; font-size: 17px; font-weight: 700; color: var(--ink-2); }
 .run-detail .cues li { font-size: 20px; }
 .run-detail .sub:first-of-type { margin-top: 16px; }
 .run-nav {

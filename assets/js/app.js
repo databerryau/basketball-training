@@ -43,6 +43,8 @@
     return rand(fresh.length ? fresh : pool);
   }
 
+  const nextFocus = focus => FOCUS_ORDER[(FOCUS_ORDER.indexOf(focus) + 1) % FOCUS_ORDER.length];
+
   // `prev` is the session being replaced. The focus only moves on once a
   // session has actually been run; replacing one that wasn't keeps its
   // focus and just picks different drills.
@@ -50,7 +52,7 @@
     const hist = store.get(KEY_HISTORY) || {};
     const keep = prev && !prev.used && THEMES[prev.focus];
     const last = prev && prev.used ? prev.focus : hist.lastFocus;
-    const focus = keep ? prev.focus : FOCUS_ORDER[(FOCUS_ORDER.indexOf(last) + 1) % FOCUS_ORDER.length];
+    const focus = keep ? prev.focus : nextFocus(last);
     const lastRun = hist.recent || [];
     const recent = lastRun.concat(prev ? Object.values(prev.slots) : []);
     const warmup = pickFrom(poolFor('warmup'), recent);
@@ -95,6 +97,7 @@
   function markUsed() {
     if (session.used) return;
     session.used = true;
+    session.usedAt = Date.now();
     save(session);
   }
 
@@ -125,7 +128,7 @@
     const cones = Math.max(0, ...drills.map(d => d.need.cones || 0));
     if (cones) items.push(`🔶 ${cones} cones`);
     if (drills.some(d => d.need.bibs)) items.push('🎽 Bibs (2 colours)');
-    items.push('📣 Whistle', '💧 Water bottles');
+    items.push('📣 Whistle', '💧 Water bottles', '🩹 First-aid kit');
     return items;
   }
 
@@ -225,11 +228,26 @@
     }
 
     const theme = THEMES[session.focus];
-    const made = new Date(session.created).toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' });
+    const day = t => new Date(t).toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' });
+    const made = day(session.created);
     const resume = run && !run.finished;
-    let clock = 0;
-    root.innerHTML = `
-      <div class="card focus-card">
+    // Once a session has been run it's the last session, not today's: lead
+    // with making the next one, so nobody runs last week's plan by mistake.
+    const done = session.used && !resume;
+    let card;
+    if (done) {
+      const ranAt = session.usedAt || session.created;
+      const today = new Date(ranAt).toDateString() === new Date().toDateString();
+      const next = THEMES[nextFocus(session.focus)];
+      card = `
+        <p class="eyebrow">Last session</p>
+        <h1><span aria-hidden="true">${theme.icon}</span> ${esc(theme.name)}</h1>
+        <p class="fixes">You ran this ${today ? 'today' : `on ${esc(day(ranAt))}`}.</p>
+        <button type="button" class="btn btn-big btn-primary" data-action="generate">${today ? 'Make the next session' : 'Make today\'s session'}</button>
+        <p class="next-focus">Next focus: <b><span aria-hidden="true">${next.icon}</span> ${esc(next.name)}</b></p>
+        <button type="button" class="btn btn-link" data-action="run">▶ Run this session again</button>`;
+    } else {
+      card = `
         <p class="eyebrow">Today's focus</p>
         <h1><span aria-hidden="true">${theme.icon}</span> ${esc(theme.name)}</h1>
         <p class="fixes">Fixes: <b>${esc(theme.fixes.toLowerCase())}</b></p>
@@ -238,8 +256,11 @@
           <ul>${needList(session).map(n => `<li>${esc(n)}</li>`).join('')}</ul>
         </div>
         <button type="button" class="btn btn-big btn-go" data-action="run">${resume ? `▶ Back to the session (part ${run.i + 1} of 6)` : '▶ Start session'}</button>
-        ${resume ? '<button type="button" class="btn btn-link" data-action="run-restart">Start again from the beginning</button>' : ''}
-      </div>
+        ${resume ? '<button type="button" class="btn btn-link" data-action="run-restart">Start again from the beginning</button>' : ''}`;
+    }
+    let clock = 0;
+    root.innerHTML = `
+      <div class="card focus-card">${card}</div>
       <h2 class="plan-title">The plan <span>60 minutes</span></h2>
       <ol class="plan">
         ${SLOTS.map((slot, i) => {
@@ -261,7 +282,7 @@
         }).join('')}
       </ol>
       <div class="plan-foot">
-        <button type="button" class="btn btn-ghost" data-action="generate">↻ Make a new session</button>
+        ${done ? '' : '<button type="button" class="btn btn-ghost" data-action="generate">↻ Make a new session</button>'}
         <p class="small">Made ${esc(made)}. Saved on this phone.</p>
         <div id="homeTip">${homeTipHTML()}</div>
       </div>`;
@@ -296,9 +317,12 @@
   }
 
   function newSession() {
-    const ask = session && (wasRun(session)
-      ? 'Make a new session?\n\nThis one will be replaced, and the focus moves on to the next skill.'
-      : 'Make a new session?\n\nYou\'ll get different drills with the same focus. The focus moves on once you\'ve used ▶ Start session.');
+    // A session that's been run and finished is simply replaced: the plan
+    // page offers the new one as the next step, so there's nothing to confirm.
+    const inProgress = run && !run.finished;
+    const ask = !session || (session.used && !inProgress) ? ''
+      : wasRun(session) ? 'Make a new session?\n\nThis one will be replaced, and the focus moves on to the next skill.'
+      : 'Make a new session?\n\nYou\'ll get different drills with the same focus. The focus moves on once you\'ve used ▶ Start session.';
     if (ask && !window.confirm(ask)) return;
     if (session && !session.used && wasRun(session)) { session.used = true; save(session); }
     session = generate(session);
@@ -351,12 +375,18 @@
   }
 
   // Sound needs a tap before it's allowed, so set it up on the first tap.
+  // A screen lock can stop it again ('suspended', or 'interrupted' on
+  // iPhone), so every tap wakes it.
   function unlockAudio() {
     if (audio === null) {
-      try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (err) { audio = false; }
+      try {
+        audio = new (window.AudioContext || window.webkitAudioContext)();
+        audio.onstatechange = () => { if (run && runOpen()) syncTimer(); };
+      } catch (err) { audio = false; }
     }
-    if (audio && audio.state === 'suspended') Promise.resolve(audio.resume()).catch(() => {});
+    if (audio && audio.state !== 'running') Promise.resolve(audio.resume()).catch(() => {});
   }
+  const soundOn = () => !!audio && audio.state === 'running';
 
   const fmt = secs => {
     const over = secs < 0;
@@ -369,24 +399,42 @@
     return (run.endAt - Date.now()) / 1000;
   }
 
-  function beep() {
+  // iPhones mute a web page's sound when silent mode is on, unless the page
+  // says it's playing something the user wants to hear. Only ask for that
+  // while the alert plays, so music from another app isn't held up.
+  function soundThroughSilent(on) {
+    try { if (navigator.audioSession) navigator.audioSession.type = on ? 'playback' : 'auto'; } catch (e) { /* not supported */ }
+  }
+
+  // Time's up: two rounds of three long beeps, loud enough for a noisy gym.
+  // `reminder` is the short double beep for each extra minute of overtime.
+  function beep(reminder) {
+    // Phones only allow a buzz once the page has been tapped (asking earlier just logs an error).
+    const tapped = !navigator.userActivation || navigator.userActivation.hasBeenActive;
+    if (navigator.vibrate && tapped) navigator.vibrate(reminder ? [200, 100, 200] : [400, 150, 400, 150, 400]);
+    if (!audio) return;
     try {
-      if (!audio) return;
-      [0, 0.32, 0.64].forEach(off => {
+      soundThroughSilent(true);
+      if (audio.state !== 'running') Promise.resolve(audio.resume()).catch(() => {});
+      const starts = reminder ? [0, 0.3] : [0, 0.5, 1, 2, 2.5, 3];
+      const len = reminder ? 0.18 : 0.4;
+      starts.forEach(off => {
         const osc = audio.createOscillator();
         const gain = audio.createGain();
         osc.type = 'square';
-        osc.frequency.value = 880;
-        const t = audio.currentTime + off;
+        osc.frequency.value = 988;
+        const t = audio.currentTime + 0.05 + off;
         gain.gain.setValueAtTime(0.0001, t);
-        gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+        gain.gain.exponentialRampToValueAtTime(0.6, t + 0.02);
+        gain.gain.setValueAtTime(0.6, t + len - 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + len);
         osc.connect(gain).connect(audio.destination);
         osc.start(t);
-        osc.stop(t + 0.25);
+        osc.stop(t + len + 0.02);
       });
+      clearTimeout(beep.done);
+      beep.done = setTimeout(() => soundThroughSilent(false), (starts[starts.length - 1] + len + 0.5) * 1000);
     } catch (e) { /* no sound available */ }
-    if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
   }
 
   async function keepAwake() {
@@ -477,6 +525,7 @@
     }
     run.i = Math.max(0, i);
     run.beeped = run.remaining[run.i] <= 0;
+    run.nagged = undefined;
     renderRun();
     if (wasStarted) setRunning(true);
     saveRun();
@@ -485,10 +534,20 @@
   function tick() {
     if (!run || run.finished) return;
     const left = remainingNow();
-    if (left <= 0 && !run.beeped) {
-      run.beeped = true;
-      saveRun(false);
-      beep();
+    if (left <= 0) {
+      // Then a short reminder for every extra minute, so overtime doesn't slip by.
+      const over = Math.floor(-left / 60);
+      if (!run.beeped) {
+        run.beeped = true;
+        run.nagged = over;
+        saveRun(false);
+        beep();
+      } else if (run.nagged === undefined) {
+        run.nagged = over;   // after a reload or Back: wait for the next full minute
+      } else if (over > run.nagged) {
+        run.nagged = over;
+        beep(true);
+      }
     }
     syncTimer();
   }
@@ -503,8 +562,11 @@
     const msg = $('#timerMsg');
     msg.textContent = left <= 0 ? 'Time\'s up! Tap Next ▶' : run.running ? '' : run.started ? 'Paused' : 'Tap Start when you\'re ready';
     msg.classList.toggle('is-over', left <= 0);
-    // After a reload the timer carries on, but the phone only allows the beep again after a tap.
-    $('#soundBtn').hidden = !(run.running && left > 0 && audio === null);
+    // After a reload or a screen lock the timer carries on, but the phone only
+    // allows the beep again after a tap.
+    $('#soundBtn').hidden = !(run.running && left > 0 && audio !== false && !soundOn());
+    const hint = $('#silentHint');
+    if (hint) hint.hidden = run.started;
     const btn = $('#startBtn');
     btn.textContent = run.running ? '❚❚ Pause' : '▶ Start';
     btn.classList.toggle('btn-go', !run.running);
@@ -533,6 +595,7 @@
             <button type="button" id="startBtn" class="btn btn-big" data-action="startstop"></button>
             <button type="button" class="btn btn-plus" data-action="plus1">+1 min</button>
           </div>
+          ${isIOS ? '<p id="silentHint" class="run-hint">🔔 Turn silent mode off so you hear the beep.</p>' : ''}
         </div>
         <div class="run-detail">${partHTML(session, slot, { big: true })}</div>
       </div>
@@ -553,7 +616,7 @@
       <div class="finish">
         <p class="finish-emoji" aria-hidden="true">🎉</p>
         <h2>Great session!</h2>
-        <p class="lead">Well done, coach. Next time you tap “Make a new session”, the focus moves on to the next skill.</p>
+        <p class="lead">Well done, coach. Your next session works on <b>${esc(THEMES[nextFocus(session.focus)].name)}</b>.</p>
         <button type="button" class="btn btn-big btn-primary" data-action="exit">Done</button>
       </div>`;
   }
@@ -671,6 +734,7 @@
         if (run.running) run.endAt += 60000;
         else run.remaining[run.i] += 60;
         if (remainingNow() > 0) run.beeped = false;
+        run.nagged = undefined;
         saveRun();
         syncTimer();
         break;
@@ -692,7 +756,10 @@
   });
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && run && run.running) keepAwake();
+    if (document.visibilityState !== 'visible' || !run || !run.running) return;
+    keepAwake();
+    // Some phones let sound start again without a tap; if not, the button shows.
+    if (audio && audio.state !== 'running') Promise.resolve(audio.resume()).catch(() => {});
   });
 
   // Another copy of the app (a second tab, or the home screen app on Android)

@@ -81,9 +81,9 @@ const DRILLS = [
     id: 'sharks', name: 'Sharks and Minnows', slot: 'warmup',
     need: { balls: 'each' },
     steps: [
-      'Minnows (most of the team) each have a ball and line up on one sideline.',
+      'Minnows (most of the team) each have a ball and line up on one sideline. If a wall is close, use a line of cones 3 big steps in from each side instead.',
       'Pick 1 or 2 sharks. They have no ball and stand in the middle.',
-      'Shout "Go!" Minnows dribble across to the other sideline. Sharks try to knock their balls away.',
+      'Shout "Go!" Minnows dribble across and stop at the other side. Sharks try to knock their balls away.',
       'If a shark knocks your ball away, you become a shark too.',
       'Keep going until 1 or 2 minnows are left. They\'re the winners! Start again with new sharks.',
     ],
@@ -130,10 +130,10 @@ const DRILLS = [
     need: { balls: 'each' },
     steps: [
       'Everyone has a ball and stays inside the 3-point line.',
-      'Everyone dribbles and tries to tap other players\' balls out of the area.',
+      'Everyone dribbles and tries to tap other players\' balls out of the area. Tap the ball, never the player.',
       'Protect your own ball with your body and your free arm.',
       'If your ball goes out, do 10 crossovers outside the line, then come straight back in.',
-      'Make the area smaller (just the key) to make it harder.',
+      'To make it harder, use a smaller space with fewer players: half the team plays in the key while the rest dribble around the outside. Swap every minute.',
     ],
     say: ['Free arm up like a shield', 'Keep it low', 'Never stop dribbling'],
     anim: {
@@ -350,9 +350,9 @@ const DRILLS = [
     need: { balls: 'some', cones: 5 },
     steps: [
       'Put 5 cones in a curve about 2 big steps from the hoop.',
-      'Pairs: one shooter, one rebounder (one pair per cone if you can, or take turns).',
+      'Pairs: one shooter, one rebounder. Only 2 pairs at the hoop at a time, starting at opposite ends of the curve.',
       'Shoot from the first cone. Make it, move to the next cone. Miss? Try again (3 tries, then move on anyway).',
-      'The rebounder passes the ball back every time. Swap jobs after going round all 5 cones.',
+      'The rebounder passes the ball back every time. After all 5 cones, swap jobs, then the next pair comes on. Waiting pairs shoot the ball high to each other.',
       'Shoot with BEEF: Balance, Eyes on the hoop, Elbow under the ball, Follow through.',
     ],
     say: ['Elbow under the ball', 'Wave goodbye: follow through!', 'Bend your knees, use your legs'],
@@ -516,11 +516,11 @@ const DRILLS = [
     id: 'box-out', name: 'Box Out Battle', slot: 'skill', theme: 'defence',
     need: { balls: 'some', bibs: true },
     steps: [
-      'Pairs near the key: one attacker and one defender (in a bib). The defender stands between her attacker and the hoop.',
+      'Two pairs at a time, one on each side of the key: an attacker, and a defender (in a bib) between her and the hoop. The other pairs wait at the 3-point line.',
       'You (the coach) shoot from the top.',
-      'When the shot goes up, the defender turns, puts her back against the attacker, bends her knees and spreads her arms wide.',
+      'When the shot goes up, the defender turns, puts her back against the attacker, bends her knees and spreads her arms wide. The attacker tries to get around her to the ball.',
       'Hold her out until the ball bounces, then grab it with 2 hands. No pushing with your hands!',
-      'Swap jobs after every shot.',
+      'After each shot the next 2 pairs come on. Swap jobs with your partner each turn.',
     ],
     say: ['Find her, turn, sit!', 'Arms out wide like wings', 'Grab it with two hands'],
     anim: {
@@ -663,7 +663,7 @@ const DRILLS = [
     id: 'three-pass', name: 'Three-Pass Game', slot: 'game', theme: 'sense',
     need: { balls: 'some', bibs: true },
     steps: [
-      '2 teams with bibs: 4 v 4 (or 5 v 5) on the half court. Swap extra players in every 2 minutes.',
+      '2 teams with bibs: 4 v 4 (or 5 v 5) on the half court. Swap extra players in every 2 minutes. Spare balls go in the bag so nobody trips.',
       'Normal basketball, with one rule: your team must make 3 passes before anyone can shoot.',
       'Everyone counts the passes out loud.',
       'When the defence gets the ball, they take it out past the 3-point line before they attack.',
@@ -690,7 +690,7 @@ const DRILLS = [
     id: 'freeze-game', name: 'Freeze Game', slot: 'game', theme: 'sense',
     need: { balls: 'some', bibs: true },
     steps: [
-      '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes.',
+      '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes. Spare balls go in the bag so nobody trips.',
       'Play normal basketball.',
       'Every 30–60 seconds, blow your whistle and shout "FREEZE!" Everyone stops like a statue.',
       'Check: are 2 attackers close enough to touch? Then the other team gets the ball. Is every defender between her player and the hoop? Defence gets a point.',
@@ -717,7 +717,7 @@ const DRILLS = [
     id: 'matchup-game', name: 'Matchup Game', slot: 'game', theme: 'defence',
     need: { balls: 'some', bibs: true },
     steps: [
-      '2 teams with bibs: 4 v 4 on the half court. Give everyone a number, 1 to 4, in each team.',
+      '2 teams with bibs: 4 v 4 on the half court. Give everyone a number, 1 to 4, in each team. Spare balls go in the bag so nobody trips.',
       'You can only guard the player with the SAME number as you.',
       'Before each attack, defenders point at their player and shout her number.',
       'Play normal basketball. Defence gets a point for every steal or stop. Basket = 2 points.',
@@ -744,7 +744,7 @@ const DRILLS = [
     id: 'inside-points', name: 'Inside Points', slot: 'game', theme: 'score',
     need: { balls: 'some', bibs: true },
     steps: [
-      '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes.',
+      '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes. Spare balls go in the bag so nobody trips.',
       'Normal basketball, but a basket from INSIDE the key = 2 points. Any other basket = 1 point.',
       'Attack the hoop: dribble or cut to the basket for layups.',
       'Defence: stop the layup by staying between your player and the hoop. Hands up. Don\'t hit arms.',
@@ -770,7 +770,7 @@ const DRILLS = [
     id: 'rotating-3v3', name: 'Rotating 3 v 3', slot: 'game', theme: 'ball',
     need: { balls: 'some', bibs: true },
     steps: [
-      'Make 3 teams of 3 (with 8 players, play 4 v 4 and swap 2 players at a time instead).',
+      'Make 3 teams of 3 (with 8 players, play 4 v 4 and swap 2 players at a time instead). Spare balls go in the bag so nobody trips.',
       '2 teams play 3 v 3 on the half court. The third team waits at half way, dribbling on the spot.',
       'Special rule: no more than 3 bounces, then you must pass or shoot.',
       'After every basket (or every 2 minutes), the waiting team comes on and the team that has been on longest goes off.',

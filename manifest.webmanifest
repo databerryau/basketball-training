@@ -2,7 +2,7 @@
   "name": "Easy Basketball Training",
   "short_name": "Basketball",
   "description": "One tap makes a full 60-minute junior basketball training session. Made for brand-new coaches.",
-  "id": "./",
+  "id": "/basketball-training/",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

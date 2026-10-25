@@ -104,6 +104,7 @@ Every drill (warm-up, skills, team game) has a **Swap** button. It replaces that
 
 - The current session is saved **on that phone**, so the coach can make it at home and open the same plan at the court. (On iPhone, the home screen icon keeps its own saved sessions, separate from Safari.)
 - *Make a new session* replaces it. The page asks "Are you sure?" first.
+- Once a session has been run, the plan page shows it as the **Last session** ("You ran this on Sunday 19 October"), with a big **Make today's session** button and the next focus under it, so nobody runs last week's plan by mistake. That button doesn't ask "Are you sure?". *Run this session again* is still there as a small link.
 - If saving isn't possible (private browsing), everything still works. It just won't be remembered.
 
 ---
@@ -147,6 +148,7 @@ Every drill must work for **8–10 players on a half court with 1 hoop**, using 
 
 - Short lines (no more than 3 waiting), lots of touches, nobody sits out for long.
 - No "you're out" elimination games. If you're caught, you do a quick task and come straight back in.
+- Safe spacing: no more than 2 pairs going for one ball or shooting at the hoop at once, finish lines at least 3 big steps from a wall, tap the ball and never the player, and spare balls in the bag during team games.
 - Fun first. Competition is team-based and light ("first team to 10").
 
 ---
@@ -157,11 +159,12 @@ A full-screen mode for running the session live.
 
 - **One part per screen**: "Part 2 of 6 · Skill 1", the drill name, a big **countdown timer**, the animated diagram, *What to say* and *How it works*.
 - **Timer**: starts when the coach taps **Start**. **Pause** and **+1 min** buttons.
-- **Time's up**: three beeps, a buzz (on phones that support it), and a **"Time's up! Tap Next"** message. The timer then counts **overtime** in red (+0:23), so the coach knows they're running over. It never skips ahead by itself.
+- **Time's up**: two rounds of three long, loud beeps, a buzz (on phones that support it), and a **"Time's up! Tap Next"** message. The timer then counts **overtime** in red (+0:23), with a short double beep every extra minute, so the coach knows they're running over. It never skips ahead by itself.
+- **iPhone silent mode** normally mutes a web page. While the alert plays, the app asks the phone to play it anyway (where the phone supports that), and before the timer starts the iPhone run screen says to turn silent mode off. If the phone stops the sound (after a screen lock, for example), the **Tap to turn the beep back on** button comes back.
 - **Next / Back**: big buttons at the bottom. Tapping **Next** starts the next part's timer straight away, because the time for each part includes setting up and explaining.
 - **Swap this drill** is available here too, in case something isn't working.
 - **Screen stays on** while the session is running (where the phone allows it).
-- After the huddle: a **"Great session!"** screen.
+- After the huddle: a **"Great session!"** screen that names the next session's focus.
 - **Exit** (✕) goes back to the plan at any time.
 - **Safe if the page reloads.** Phones often reload a page that was in the background (the screen locked, or the coach answered a text). Once the timer has been started, the session opens again at the same part, and a running timer keeps counting. Sound needs a tap before the phone allows it, so a **Tap to turn the beep back on** button shows until the coach taps anything. A session nobody has tapped for 2 hours is treated as over. If the app is open twice (two tabs, or the browser and the home screen app on Android), both follow the latest tap instead of overwriting each other.
 
@@ -171,7 +174,7 @@ A full-screen mode for running the session live.
 
 A second tab with four short sections. Each is a list of small cards, readable in under a minute.
 
-1. **New coach basics**: getting their attention, explaining a drill in 30 seconds, keeping lines short, praising out loud and correcting quietly, one fix at a time, safety and water, what to do when a drill isn't working, putting the app on the home screen.
+1. **New coach basics**: getting their attention, explaining a drill in 30 seconds, keeping lines short, praising out loud and correcting quietly, one fix at a time, safety and water, what to do if someone gets hurt, head knocks ("if in doubt, sit her out"), keeping kids safe (Working With Children Check, never alone with one child), hearing the beep, what to do when a drill isn't working, putting the app on the home screen.
 2. **Rules made simple**: travelling, double dribble, fouls, 3 seconds, out of bounds and throw-ins, backcourt, held balls, free throws, scoring. Plus a reminder that junior leagues often have their own rules.
 3. **Basketball words**: a small glossary (layup, jump stop, pivot, triple threat, box out, give-and-go, key, wing, baseline and more).
 4. **Game day**: before the game, fair minutes for everyone with simple sub patterns, what to say at time-outs, staying positive, the after-game huddle.
