@@ -141,7 +141,8 @@
     return n.length ? n.join(' · ') : 'nothing! Just space';
   }
 
-  const diagramLabel = d => `Animated diagram of ${d.name}. Blue circles are our players, red circles are defenders, the orange dot is the ball.`;
+  // The diagram adds what each colour means.
+  const diagramLabel = d => `Animated diagram of ${d.name}`;
 
   // HTML for one part of the session. `opts.big` = run-mode sizing.
   function partHTML(s, slot, opts = {}) {

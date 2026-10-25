@@ -115,14 +115,17 @@ Every drill card has:
 
 1. **Name**: short and fun (for example *Sharks and Minnows*, *Find Your Player*).
 2. **Animated court diagram**: a half court seen from above, with:
-   - blue circles = our attackers (numbered when it matters)
+   - blue circles = our players or attackers (numbered when it matters)
    - red circles = defenders / taggers
+   - green circles = the second team, or the team waiting to come on
    - a grey **C** = the coach
-   - an orange dot = the ball (it bounces when someone's dribbling and arcs when it's shot)
+   - an orange dot = the ball. A player holding it has it in front of her ("at her chin"), so it turns with her when she pivots, and a player who's just caught it turns to face whoever she passes to next. A player dribbling has it bouncing at her side, in the hand the drill says (it crosses over when she swaps hands). Passes loop slightly, bounce passes go via the floor, and shots arc.
    - orange triangles = cones
    - faint dashed lines = where players run
    - a caption bar under the court saying what's happening right now ("Red light! Jump stop")
-   - tap the diagram to pause or play. Animations loop. With *reduce motion* switched on, the diagram starts paused.
+   - a small key under the caption naming each colour in that drill ("Shooter", "Rebounder", "Taggers"...)
+   - tap the diagram to pause or play. Animations loop. With *reduce motion* switched on, the diagram starts paused on a moment that shows the drill.
+   - the picture matches the words: distances in the steps are drawn to scale (1 big step ≈ 0.8 m), players join the right spot at the back of a line by going round it, defenders stay between their player and the hoop without standing on her, and passes go round defenders rather than through them.
 3. **How it works**: 3–5 numbered steps in plain English.
 4. **What to say**: 2–3 short coaching cues to shout ("Eyes up!", "Right, left, UP!").
 5. **You need**: balls, cones, bibs.

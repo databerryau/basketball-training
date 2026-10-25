@@ -52,7 +52,7 @@ Everything lives in `assets/js/drills.js`. Each drill has:
 - `theme`: `sense`, `ball`, `score` or `defence` (skills and games)
 - `steps` and `say`: plain-English steps and 2–3 short cues
 - `need`: balls, cones, bibs
-- `anim`: the animation. Players move between keyframes `[time, x, y]`. Time runs from 0 to 1 over the loop, and the half court is 500 wide × 467 deep with the basket at the top. The format is explained at the top of `court.js`.
+- `anim`: the animation. Players move between keyframes `[time, x, y]`. Time runs from 0 to 1 over the loop, and the half court is 500 wide × 467 deep with the basket at the top (1 big step ≈ 27 units). Players can also turn (`face`, for a pivot), hold their ball (`hold`, for a jump stop) and swap dribbling hands (`hands`). The format is explained at the top of `court.js`.
 
 ## Publishing
 
