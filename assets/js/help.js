@@ -14,6 +14,7 @@ const HELP = [
       { t: 'If a drill isn\'t working', d: 'Make it easier (closer, slower, no defender) or just tap Swap and move on. That\'s normal. Every coach does it.' },
       { t: 'Safety first', d: 'Water break in the middle. No jewellery, shoelaces tied. If someone is hurt, stop everything and check on her first.' },
       { t: 'Start and finish on time', d: 'Parents will love you for it. The timer in "Start session" helps.' },
+      { t: 'Put it on your home screen', d: 'Then it opens like an app and works at the court with no internet. iPhone: in Safari, tap Share (the square with an arrow; if you can\'t see it, tap ••• first), then scroll down and tap "Add to Home Screen". Open the new icon once while you have internet and make your sessions there: it keeps its own sessions, separate from Safari. Android: in Chrome, tap the menu ⋮, then "Add to Home screen" or "Install app".' },
       { t: 'Fun is the goal', d: 'If they\'re laughing, moving and want to come back next week, you\'re doing it right.' },
     ],
   },

@@ -12,7 +12,8 @@ Live site: **https://databerryau.github.io/basketball-training/**
 | **Today's focus** | Each session works on one problem from games (bunching, turnovers, scoring or defence). The focus rotates automatically. |
 | **Animated drills** | Every drill has a little half-court animation, numbered steps, "what to say" coaching cues and the equipment needed. |
 | **Swap** | Don't like a drill? Swap it for another one that fits the same slot. |
-| **Start session** | At the court: one part per screen, a big countdown timer, beeps when time's up, and the screen stays on. |
+| **Start session** | At the court: one part per screen, a big countdown timer, beeps when time's up, and the screen stays on. If the phone reloads the page, it carries on where it was. |
+| **No internet needed** | After one visit it opens with no reception. Add it to the home screen and it opens like an app. |
 | **Coach help** | New coach basics, simple rules, basketball words and game-day tips. |
 
 The full spec (from the interview) is in [SPEC.md](SPEC.md).
@@ -26,16 +27,21 @@ python3 -m http.server 8000
 # then open http://localhost:8000/
 ```
 
+The offline copy (`sw.js`) is switched off on `localhost`, so it can't get in the way of other projects on the same port. To test it, open `http://localhost:8000/?sw`. With it on, a change shows up on the **second** reload, or tick *Update on reload* in the browser's DevTools (Application → Service workers).
+
 ## Files
 
 ```
 index.html             page structure
 SPEC.md                the spec
+sw.js                  offline copy (service worker)
+manifest.webmanifest   home screen name, colours and icons
 assets/css/style.css   bright, friendly theme
 assets/js/court.js     half-court drawing and animation engine
 assets/js/drills.js    every drill: steps, cues, equipment, animation
 assets/js/help.js      Coach help content
 assets/js/app.js       generator, session view, Start session mode
+assets/icons/          home screen icons
 ```
 
 ## Adding or changing a drill
@@ -50,4 +56,6 @@ Everything lives in `assets/js/drills.js`. Each drill has:
 
 ## Publishing
 
-GitHub Pages serves the `main` branch as-is (no build step), so every push to `main` updates the live site.
+GitHub Pages serves the `main` branch as-is (no build step), so every push to `main` updates the live site. Phones that have visited before open their offline copy first and pick up the new version in the background, so they see it the next time the page is opened.
+
+If you add, rename or remove a file, update the list in `sw.js` and change its `VERSION` (for example `basketball-training-v1` → `basketball-training-v2`).

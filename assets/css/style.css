@@ -138,6 +138,11 @@ main { max-width: 680px; margin: 0 auto; padding: 16px 16px 48px; }
 .part-body { padding: 0 16px 18px; }
 .plan-foot { text-align: center; margin-top: 24px; }
 .plan-foot .btn { width: 100%; }
+.home-tip { margin-top: 20px; padding: 16px; border-radius: 16px; background: var(--card); border: 2px dashed var(--line); text-align: left; font-size: 17px; }
+.home-tip p { margin: 0 0 8px; }
+.home-tip p:last-child { margin-bottom: 0; }
+.home-tip-title { font-weight: 900; }
+.home-tip .btn { width: 100%; }
 
 /* ---------- drill details ---------- */
 .sub { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; color: var(--orange-dark); margin: 18px 0 8px; }
@@ -212,6 +217,7 @@ main { max-width: 680px; margin: 0 auto; padding: 16px 16px 48px; }
 .timer-btns .btn-big { flex: 1; background: var(--ink); color: #fff; box-shadow: 0 4px 0 #0E1630; }
 .timer-btns .btn-big.btn-go { background: var(--green); box-shadow: 0 4px 0 var(--green-dark); }
 .btn-plus { background: var(--orange-soft); color: var(--orange-dark); min-height: 64px; border-radius: 18px; }
+.btn-sound { width: 100%; margin-bottom: 12px; background: var(--yellow); color: var(--ink); border: 2px solid #FCD34D; }
 .run-detail .cues li { font-size: 20px; }
 .run-detail .sub:first-of-type { margin-top: 16px; }
 .run-nav {

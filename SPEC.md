@@ -77,18 +77,20 @@ Each session picks **one focus**, and each focus fixes one of the game problems:
 | **Stop them scoring** | Defence is lost | Stance, slides, "find your player", closeouts, boxing out |
 
 - The focus **rotates** in that order. The first session ever is *Spread out & get open*, the most common beginner problem.
-- The page remembers the last focus on that phone, so the next session moves on to the next one.
+- The focus only moves on once a session has been **run** (the timer was started, or the coach got to the end). Making a new session before running the current one keeps the same focus and picks different drills, so no focus gets skipped.
+- Some coaches only read the plan and never use *Start session*. So a session made **2 or more days ago** also counts as run when it's replaced, or their focus would never move on.
+- The page remembers the last focus on that phone.
 
 ### 3.3 How a session is put together
 
-1. **Focus** = the next one in the rotation.
+1. **Focus** = the next one in the rotation (or the same one again, if the session being replaced was never run).
 2. **Warm-up game** = any warm-up game, avoiding the ones used last session.
 3. **Skill 1** = a skill drill **for today's focus**.
 4. **Skill 2** = a skill drill **from one of the other three skills**.
 5. **Team game** = the team game that matches today's focus (or any team game if that one was used last session).
 6. **Huddle** = always the same routine, with a question and home challenge that match today's focus.
 
-Drills used in the last session are avoided where possible, so back-to-back sessions feel different.
+Drills used in the last session that was run, and in the session being replaced, are avoided where possible, so back-to-back sessions feel different. The exception is the team game that matches the focus: most focuses have only one, so replacing a session that wasn't run keeps it.
 
 ### 3.4 Swap a drill
 
@@ -100,7 +102,7 @@ Every drill (warm-up, skills, team game) has a **Swap** button. It replaces that
 
 ### 3.5 Remembering
 
-- The current session is saved **on that phone**, so the coach can make it at home and open the same plan at the court.
+- The current session is saved **on that phone**, so the coach can make it at home and open the same plan at the court. (On iPhone, the home screen icon keeps its own saved sessions, separate from Safari.)
 - *Make a new session* replaces it. The page asks "Are you sure?" first.
 - If saving isn't possible (private browsing), everything still works. It just won't be remembered.
 
@@ -161,6 +163,7 @@ A full-screen mode for running the session live.
 - **Screen stays on** while the session is running (where the phone allows it).
 - After the huddle: a **"Great session!"** screen.
 - **Exit** (✕) goes back to the plan at any time.
+- **Safe if the page reloads.** Phones often reload a page that was in the background (the screen locked, or the coach answered a text). Once the timer has been started, the session opens again at the same part, and a running timer keeps counting. Sound needs a tap before the phone allows it, so a **Tap to turn the beep back on** button shows until the coach taps anything. A session nobody has tapped for 2 hours is treated as over. If the app is open twice (two tabs, or the browser and the home screen app on Android), both follow the latest tap instead of overwriting each other.
 
 ---
 
@@ -168,7 +171,7 @@ A full-screen mode for running the session live.
 
 A second tab with four short sections. Each is a list of small cards, readable in under a minute.
 
-1. **New coach basics**: getting their attention, explaining a drill in 30 seconds, keeping lines short, praising out loud and correcting quietly, one fix at a time, safety and water, what to do when a drill isn't working.
+1. **New coach basics**: getting their attention, explaining a drill in 30 seconds, keeping lines short, praising out loud and correcting quietly, one fix at a time, safety and water, what to do when a drill isn't working, putting the app on the home screen.
 2. **Rules made simple**: travelling, double dribble, fouls, 3 seconds, out of bounds and throw-ins, backcourt, held balls, free throws, scoring. Plus a reminder that junior leagues often have their own rules.
 3. **Basketball words**: a small glossary (layup, jump stop, pivot, triple threat, box out, give-and-go, key, wing, baseline and more).
 4. **Game day**: before the game, fair minutes for everyone with simple sub patterns, what to say at time-outs, staying positive, the after-game huddle.
@@ -187,22 +190,27 @@ A second tab with four short sections. Each is a list of small cards, readable i
 
 ## 8. Technical
 
-- **A static site**: plain HTML, CSS and JavaScript. No build step, no frameworks, no tracking, works offline once loaded.
+- **A static site**: plain HTML, CSS and JavaScript. No build step, no frameworks, no tracking.
+- **Works with no internet.** A service worker (`sw.js`) keeps a copy of the app and its font on the phone after the first visit, and the app always opens from that copy. Each time it's opened, a fresh copy of every file is fetched in the background, and the phone only switches over once all of them have arrived (so a weak signal can't leave a mix of old and new files). A new version therefore shows up the time after it's first opened. It's switched off on `localhost` unless the address has `?sw`.
+- **Home screen.** A web app manifest and icons let the coach add it to the home screen, where it opens full screen like an app. On iPhone the home screen app keeps its own storage, separate from Safari, so the tip says to open the new icon once with internet and make sessions there. (That also stops Safari clearing saved sessions after a few weeks without a visit.) The start page and the plan page show how to do it on phones: an *Add to home screen* button where the browser offers one, otherwise short iPhone or Android steps, or "open it in your browser first" inside Facebook, Messenger or Instagram. Coach help says the same. The tip is hidden on computers and once the app is installed.
 - **Files**
 
   ```
   index.html             page structure
   SPEC.md                this document
   README.md              how to run and update it
+  sw.js                  offline copy (service worker)
+  manifest.webmanifest   home screen name, colours and icons
   assets/css/style.css   bright, friendly theme
   assets/js/court.js     half-court drawing and animation engine
   assets/js/drills.js    every drill: steps, cues, equipment, animation
   assets/js/help.js      Coach help content
   assets/js/app.js       generator, session view, Start session mode
+  assets/icons/          home screen icons
   ```
 
 - **Animations** are data, not video. Each drill lists players, cones and the ball with keyframes (`[time, x, y]` on a 500 × 467 half court), and `court.js` draws and animates them with SVG. Defenders can be told to "guard" an attacker, which keeps them between that player and the hoop automatically.
-- **Storage**: the current session and the last focus are kept in `localStorage`, wrapped so the page still works without it.
+- **Storage**: the current session, the last focus (and recent drills) of the last session that was run, and the state of a running session are kept in `localStorage`, wrapped so the page still works without it.
 - **Hosting: GitHub Pages**, from the `main` branch of its own repo (`databerryau/basketball-training`):
   **https://databerryau.github.io/basketball-training/**
   It started as a folder inside `databerryau/Spain-football-dashboard` and was moved here with its history.
@@ -217,6 +225,9 @@ A second tab with four short sections. Each is a list of small cards, readable i
 - [ ] **Swap** changes one drill and keeps the slot's rules.
 - [ ] The session is still there after closing and reopening the page.
 - [ ] **Start session** runs every part with a timer, beeps at zero, shows overtime, and Next/Back work.
+- [ ] Reloading the page during **Start session** carries on at the same part, with the timer where it should be.
+- [ ] The focus doesn't move on when a session is replaced without being run.
+- [ ] After one visit, the page opens with no internet, and it can be added to the home screen.
 - [ ] **Coach help** has all four sections.
 - [ ] No horizontal scrolling at 360px wide, and no console errors.
 - [ ] Published on GitHub Pages.

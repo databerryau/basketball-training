@@ -14,6 +14,9 @@
   const byId = Object.fromEntries(DRILLS.map(d => [d.id, d]));
   const KEY_SESSION = 'ebt.session.v1';
   const KEY_HISTORY = 'ebt.history.v1';
+  const KEY_RUN = 'ebt.run.v1';
+  // A run nobody has touched for this long is over (they went home without tapping Finish).
+  const RUN_STALE_MS = 2 * 60 * 60 * 1000;
 
   const $ = (sel, root = document) => root.querySelector(sel);
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -23,6 +26,7 @@
   const store = {
     get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } },
     set(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) { /* private mode */ } },
+    del(key) { try { localStorage.removeItem(key); } catch (e) { /* private mode */ } },
   };
 
   /* ---------- generator ---------- */
@@ -39,16 +43,25 @@
     return rand(fresh.length ? fresh : pool);
   }
 
-  function generate() {
+  // `prev` is the session being replaced. The focus only moves on once a
+  // session has actually been run; replacing one that wasn't keeps its
+  // focus and just picks different drills.
+  function generate(prev) {
     const hist = store.get(KEY_HISTORY) || {};
-    const focus = FOCUS_ORDER[(FOCUS_ORDER.indexOf(hist.lastFocus) + 1) % FOCUS_ORDER.length];
-    const recent = hist.recent || [];
+    const keep = prev && !prev.used && THEMES[prev.focus];
+    const last = prev && prev.used ? prev.focus : hist.lastFocus;
+    const focus = keep ? prev.focus : FOCUS_ORDER[(FOCUS_ORDER.indexOf(last) + 1) % FOCUS_ORDER.length];
+    const lastRun = hist.recent || [];
+    const recent = lastRun.concat(prev ? Object.values(prev.slots) : []);
     const warmup = pickFrom(poolFor('warmup'), recent);
     const skill1 = pickFrom(poolFor('skill1', focus), recent);
     const skill2 = pickFrom(poolFor('skill2', focus), recent);
+    // Most focuses have only one matching team game, so keep it even if the
+    // session being replaced had it. Only the last session that was run rules it out.
     const games = poolFor('game');
-    const matched = games.filter(g => g.theme === focus && !recent.includes(g.id));
-    const game = matched.length ? rand(matched) : pickFrom(games, recent);
+    const matched = games.filter(g => g.theme === focus && !lastRun.includes(g.id));
+    const freshMatched = matched.filter(g => !recent.includes(g.id));
+    const game = freshMatched.length ? rand(freshMatched) : matched.length ? rand(matched) : pickFrom(games, recent);
     const s = { v: 1, created: Date.now(), focus, slots: { warmup: warmup.id, skill1: skill1.id, skill2: skill2.id, game: game.id }, seen: {} };
     DRILL_SLOTS.forEach(k => { s.seen[k] = [s.slots[k]]; });
     return s;
@@ -71,10 +84,25 @@
     s.seen[slot] = seen.concat(next.id);
   }
 
+  // History (what the next session moves on from) only follows sessions
+  // that were run.
   function save(s) {
     store.set(KEY_SESSION, s);
-    store.set(KEY_HISTORY, { lastFocus: s.focus, recent: Object.values(s.slots) });
+    if (s.used) store.set(KEY_HISTORY, { lastFocus: s.focus, recent: Object.values(s.slots) });
   }
+
+  // Called when the coach starts the timer or reaches the end of the session.
+  function markUsed() {
+    if (session.used) return;
+    session.used = true;
+    save(session);
+  }
+
+  // Some coaches only read the plan and never use Start session. A session
+  // made a couple of days ago was most likely used at training, so count it,
+  // or their focus would never move on.
+  const USED_AFTER_MS = 2 * 24 * 60 * 60 * 1000;
+  const wasRun = s => s.used || Date.now() - s.created >= USED_AFTER_MS;
 
   function load() {
     const s = store.get(KEY_SESSION);
@@ -191,7 +219,8 @@
             <li><b>Have a look at home.</b> Tap any drill to see how it works.</li>
             <li><b>At the court, tap “Start session”</b> and follow the timer.</li>
           </ol>
-        </div>`;
+        </div>
+        <div id="homeTip">${homeTipHTML()}</div>`;
       return;
     }
 
@@ -234,6 +263,7 @@
       <div class="plan-foot">
         <button type="button" class="btn btn-ghost" data-action="generate">↻ Make a new session</button>
         <p class="small">Made ${esc(made)}. Saved on this phone.</p>
+        <div id="homeTip">${homeTipHTML()}</div>
       </div>`;
 
     SLOTS.forEach(slot => {
@@ -266,10 +296,15 @@
   }
 
   function newSession() {
-    if (session && !window.confirm('Make a new session?\n\nThis one will be replaced.')) return;
-    session = generate();
+    const ask = session && (wasRun(session)
+      ? 'Make a new session?\n\nThis one will be replaced, and the focus moves on to the next skill.'
+      : 'Make a new session?\n\nYou\'ll get different drills with the same focus. The focus moves on once you\'ve used ▶ Start session.');
+    if (ask && !window.confirm(ask)) return;
+    if (session && !session.used && wasRun(session)) { session.used = true; save(session); }
+    session = generate(session);
     save(session);
     run = null;
+    store.del(KEY_RUN);
     openParts.clear();
     openParts.add('warmup');
     renderPlan();
@@ -277,11 +312,51 @@
   }
 
   /* ---------- run mode (at the court) ---------- */
-  let run = null;          // { i, remaining: [secs per part], running, endAt, beeped, finished }
+  let run = null;          // { i, remaining: [secs per part], running, endAt, beeped, started, finished }
   let runDiagrams = [];
   let ticker = null;
   let wakeLock = null;
-  let audio = null;
+  let wakeLockAsking = false;
+  let audio = null;        // null = not set up yet (needs a tap), false = no sound on this device
+
+  const runOpen = () => !$('#run').hidden;
+
+  // Once the timer has been started, the run is saved after every change, so
+  // if the phone reloads the page (it was in the background, the battery
+  // saver kicked in...) the session carries on from the same part. `endAt` is
+  // a clock time, so a running timer keeps counting while the page is gone.
+  // `touched` is the coach's last tap; saves the page makes by itself
+  // (reopening after a reload, time's up) leave it alone.
+  function saveRun(touch = true) {
+    if (!run || run.finished || !run.started || !session) { store.del(KEY_RUN); return; }
+    if (touch || !run.touched) run.touched = Date.now();
+    store.set(KEY_RUN, {
+      sid: session.created, i: run.i, remaining: run.remaining, running: run.running, endAt: run.endAt,
+      beeped: run.beeped, started: run.started, open: runOpen(), saved: run.touched,
+    });
+  }
+
+  function loadRun() {
+    const r = store.get(KEY_RUN);
+    const ok = r && session && r.sid === session.created && r.started
+      && Number.isInteger(r.i) && r.i >= 0 && r.i < SLOTS.length
+      && Array.isArray(r.remaining) && r.remaining.length === SLOTS.length && r.remaining.every(Number.isFinite)
+      && (!r.running || Number.isFinite(r.endAt))
+      && Number.isFinite(r.saved) && Date.now() - r.saved < RUN_STALE_MS;
+    if (!ok) { if (r) store.del(KEY_RUN); return null; }
+    return {
+      i: r.i, remaining: r.remaining, running: !!r.running, endAt: r.endAt || 0,
+      beeped: !!r.beeped, started: true, finished: false, open: !!r.open, touched: r.saved,
+    };
+  }
+
+  // Sound needs a tap before it's allowed, so set it up on the first tap.
+  function unlockAudio() {
+    if (audio === null) {
+      try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (err) { audio = false; }
+    }
+    if (audio && audio.state === 'suspended') Promise.resolve(audio.resume()).catch(() => {});
+  }
 
   const fmt = secs => {
     const over = secs < 0;
@@ -315,12 +390,19 @@
   }
 
   async function keepAwake() {
+    if (!('wakeLock' in navigator) || wakeLock || wakeLockAsking) return;
+    wakeLockAsking = true;
     try {
-      if ('wakeLock' in navigator && !wakeLock) {
-        wakeLock = await navigator.wakeLock.request('screen');
-        wakeLock.addEventListener('release', () => { wakeLock = null; });
-      }
-    } catch (e) { /* not allowed: fine */ }
+      const lock = await navigator.wakeLock.request('screen');
+      // The session may have been closed while the phone was answering.
+      if (!run || run.finished || !runOpen()) { lock.release().catch(() => {}); return; }
+      wakeLock = lock;
+      lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; });
+    } catch (e) {
+      /* not allowed (iPhone needs a tap first): fine */
+    } finally {
+      wakeLockAsking = false;
+    }
   }
   function letSleep() {
     if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
@@ -330,15 +412,32 @@
     if (!run || fromStart || run.finished) {
       run = { i: 0, remaining: SLOTS.map(s => s.min * 60), running: false, endAt: 0, beeped: false, started: false, finished: false };
     }
+    openRun();
+  }
+
+  function openRun() {
+    showRun();
+    saveRun();
+  }
+
+  // Shows the run view without saving (also used when another copy of the
+  // app changed the run, so the two don't keep overwriting each other).
+  function showRun() {
     $('#run').hidden = false;
     document.body.classList.add('running');
     renderRun();
     clearInterval(ticker);
     ticker = setInterval(tick, 250);
+    if (run.running) keepAwake();
   }
 
   function exitRun() {
     if (run && run.running) setRunning(false);
+    hideRun();
+    saveRun();
+  }
+
+  function hideRun() {
     clearInterval(ticker);
     runDiagrams.forEach(c => c.destroy());
     runDiagrams = [];
@@ -356,10 +455,12 @@
       run.running = true;
       run.started = true;
       keepAwake();
+      markUsed();
     } else {
       run.remaining[run.i] = remainingNow();
       run.running = false;
     }
+    saveRun();
     syncTimer();
   }
 
@@ -369,6 +470,8 @@
     run.running = false;
     if (i >= SLOTS.length) {
       run.finished = true;
+      markUsed();
+      saveRun();
       renderFinish();
       return;
     }
@@ -376,6 +479,7 @@
     run.beeped = run.remaining[run.i] <= 0;
     renderRun();
     if (wasStarted) setRunning(true);
+    saveRun();
   }
 
   function tick() {
@@ -383,6 +487,7 @@
     const left = remainingNow();
     if (left <= 0 && !run.beeped) {
       run.beeped = true;
+      saveRun(false);
       beep();
     }
     syncTimer();
@@ -398,6 +503,8 @@
     const msg = $('#timerMsg');
     msg.textContent = left <= 0 ? 'Time\'s up! Tap Next ▶' : run.running ? '' : run.started ? 'Paused' : 'Tap Start when you\'re ready';
     msg.classList.toggle('is-over', left <= 0);
+    // After a reload the timer carries on, but the phone only allows the beep again after a tap.
+    $('#soundBtn').hidden = !(run.running && left > 0 && audio === null);
     const btn = $('#startBtn');
     btn.textContent = run.running ? '❚❚ Pause' : '▶ Start';
     btn.classList.toggle('btn-go', !run.running);
@@ -421,6 +528,7 @@
         <div class="timer-box">
           <p id="timer" class="timer" role="timer" aria-live="off"></p>
           <p id="timerMsg" class="timer-msg" aria-live="polite"></p>
+          <button type="button" id="soundBtn" class="btn btn-sound" data-action="sound" hidden>🔇 Tap to turn the beep back on</button>
           <div class="timer-btns">
             <button type="button" id="startBtn" class="btn btn-big" data-action="startstop"></button>
             <button type="button" class="btn btn-plus" data-action="plus1">+1 min</button>
@@ -465,6 +573,56 @@
         </details>`).join('')}`;
   }
 
+  /* ---------- home screen (opens with no internet) ---------- */
+  const KEY_INSTALLED = 'ebt.installed.v1';
+  let installPrompt = null;   // the browser's own "Install" prompt, when it offers one (Android Chrome)
+  const ua = navigator.userAgent;
+  const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const isIOS = /iP(hone|ad|od)/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /Android/i.test(ua);
+  // Facebook, Messenger, Instagram and other apps open links in their own
+  // browser, which can't add to the home screen or work offline.
+  const inAppBrowser = /FBAN|FBAV|FB_IAB|Instagram|Line\/|MicroMessenger|musical_ly|Bytedance/i.test(ua);
+
+  function markInstalled() { store.set(KEY_INSTALLED, true); }
+
+  function homeTipHTML() {
+    if (isStandalone() || store.get(KEY_INSTALLED)) return '';
+    if (!isIOS && !isAndroid) return '';   // a computer: not taken to the court
+    const title = '<p class="home-tip-title">📲 Put it on your home screen</p>';
+    let body;
+    if (inAppBrowser) {
+      body = `<p>It opens like an app and works at the court with no internet. First open this page in ${isIOS ? 'Safari' : 'Chrome'}: tap <b>•••</b> or <b>⋮</b>, then <b>Open in browser</b>.</p>`;
+    } else if (isIOS) {
+      // iPhone home screen apps keep their own storage, separate from Safari.
+      body = `
+        <p>It opens like an app and works at the court with no internet.</p>
+        <p>Tap <b>Share</b> (the square with an arrow; if you can't see it, tap <b>•••</b> first), then scroll down and tap <b>Add to Home Screen</b>.</p>
+        <p>Then open it from the new icon once while you have internet, and make your sessions there. The icon keeps its own sessions, separate from Safari.</p>`;
+    } else if (installPrompt) {
+      body = '<p>It opens like an app and works at the court with no internet.</p><button type="button" class="btn btn-ghost" data-action="install">📲 Add to home screen</button>';
+    } else {
+      body = '<p>It opens like an app and works at the court with no internet. Tap the browser menu <b>⋮</b>, then <b>Add to Home screen</b> or <b>Install app</b>.</p>';
+    }
+    return `<div class="home-tip">${title}${body}</div>`;
+  }
+
+  function refreshHomeTip() {
+    const tip = $('#homeTip');
+    if (tip) tip.innerHTML = homeTipHTML();
+  }
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    installPrompt = e;
+    refreshHomeTip();
+  });
+  window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    markInstalled();
+    refreshHomeTip();
+  });
+
   /* ---------- tabs ---------- */
   function showTab(name) {
     const help = name === 'help';
@@ -478,6 +636,12 @@
 
   /* ---------- events ---------- */
   document.addEventListener('click', e => {
+    if (run && runOpen()) {
+      unlockAudio();
+      if (run.running) keepAwake();
+      syncTimer();
+    }
+
     const tab = e.target.closest('[data-tab]');
     if (tab) { showTab(tab.dataset.tab); window.scrollTo(0, 0); return; }
 
@@ -501,20 +665,29 @@
       case 'run-restart': startRun(true); break;
       case 'exit': exitRun(); break;
       case 'startstop':
-        if (!audio) {
-          try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (err) { audio = null; }
-        }
-        if (audio && audio.state === 'suspended') audio.resume();
         setRunning(!run.running);
         break;
       case 'plus1':
         if (run.running) run.endAt += 60000;
         else run.remaining[run.i] += 60;
         if (remainingNow() > 0) run.beeped = false;
+        saveRun();
         syncTimer();
         break;
       case 'next': goTo(run.i + 1); break;
       case 'back': goTo(run.i - 1); break;
+      case 'sound': break;   // the tap itself turns the beep on (top of this handler)
+      case 'install': {
+        const p = installPrompt;
+        if (!p) break;
+        installPrompt = null;   // each prompt can only be shown once
+        p.prompt();
+        p.userChoice.then(choice => {
+          if (choice && choice.outcome === 'accepted') markInstalled();
+          refreshHomeTip();
+        }, refreshHomeTip);
+        break;
+      }
     }
   });
 
@@ -522,7 +695,29 @@
     if (document.visibilityState === 'visible' && run && run.running) keepAwake();
   });
 
+  // Another copy of the app (a second tab, or the home screen app on Android)
+  // changed the session: follow it, so the two don't overwrite each other.
+  // Nothing is saved here, or the copies would keep answering each other.
+  window.addEventListener('storage', e => {
+    if (e.key !== null && e.key !== KEY_RUN && e.key !== KEY_SESSION) return;
+    session = load();
+    run = loadRun();
+    if (run && run.open) showRun();
+    else if (runOpen()) hideRun();
+    else renderPlan();
+  });
+
+  run = loadRun();
   renderPlan();
   renderHelp();
   showTab(location.hash === '#help' ? 'help' : 'session');
+  if (run && run.open) showRun();
+
+  // Keeps a copy of the app on the phone (see sw.js). Off on this computer's
+  // own test server, where it would get in the way of other projects; add
+  // ?sw to the address to test it there.
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  if ('serviceWorker' in navigator && (!local || new URLSearchParams(location.search).has('sw'))) {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* no offline copy: still works online */ });
+  }
 })();
