@@ -191,22 +191,21 @@ A second tab with four short sections. Each is a list of small cards, readable i
 - **Files**
 
   ```
-  basketball-training/
-    index.html             page structure
-    SPEC.md                this document
-    README.md              how to run and update it
-    assets/css/style.css   bright, friendly theme
-    assets/js/court.js     half-court drawing and animation engine
-    assets/js/drills.js    every drill: steps, cues, equipment, animation
-    assets/js/help.js      Coach help content
-    assets/js/app.js       generator, session view, Start session mode
+  index.html             page structure
+  SPEC.md                this document
+  README.md              how to run and update it
+  assets/css/style.css   bright, friendly theme
+  assets/js/court.js     half-court drawing and animation engine
+  assets/js/drills.js    every drill: steps, cues, equipment, animation
+  assets/js/help.js      Coach help content
+  assets/js/app.js       generator, session view, Start session mode
   ```
 
 - **Animations** are data, not video. Each drill lists players, cones and the ball with keyframes (`[time, x, y]` on a 500 × 467 half court), and `court.js` draws and animates them with SVG. Defenders can be told to "guard" an attacker, which keeps them between that player and the hoop automatically.
 - **Storage**: the current session and the last focus are kept in `localStorage`, wrapped so the page still works without it.
-- **Hosting: GitHub Pages.** The plan was a separate repo (`databerryau/basketball-training`), but repos can't be created from this session. For now it's a self-contained folder published with the existing site:
-  **https://databerryau.github.io/Spain-football-dashboard/basketball-training/**
-  All paths are relative, so the folder can be copied as-is into its own repo later.
+- **Hosting: GitHub Pages**, from the `main` branch of its own repo (`databerryau/basketball-training`):
+  **https://databerryau.github.io/basketball-training/**
+  It started as a folder inside `databerryau/Spain-football-dashboard` and was moved here with its history.
 
 ---
 

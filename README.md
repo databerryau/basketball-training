@@ -2,7 +2,7 @@
 
 **One tap makes a full 60-minute junior basketball training session.** Built for a brand-new coach running a brand-new Under 12 girls' team on a half court with one hoop.
 
-Live site: **https://databerryau.github.io/Spain-football-dashboard/basketball-training/**
+Live site: **https://databerryau.github.io/basketball-training/**
 
 ## What it does
 
@@ -23,7 +23,7 @@ It's a static site with no build step and no dependencies:
 
 ```bash
 python3 -m http.server 8000
-# then open http://localhost:8000/basketball-training/
+# then open http://localhost:8000/
 ```
 
 ## Files
@@ -48,6 +48,6 @@ Everything lives in `assets/js/drills.js`. Each drill has:
 - `need`: balls, cones, bibs
 - `anim`: the animation. Players move between keyframes `[time, x, y]`. Time runs from 0 to 1 over the loop, and the half court is 500 wide × 467 deep with the basket at the top. The format is explained at the top of `court.js`.
 
-## Moving it to its own repo
+## Publishing
 
-This folder is self-contained (all paths are relative). To give it its own link, copy the folder's contents into a new repo, turn on GitHub Pages, and it will work as-is.
+GitHub Pages serves the `main` branch as-is (no build step), so every push to `main` updates the live site.
