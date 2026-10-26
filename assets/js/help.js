@@ -69,7 +69,7 @@ const HELP = [
     intro: 'Games are for having a go. Keep it simple and positive.',
     cards: [
       { t: 'Before the game', d: 'Arrive 20 minutes early. Warm up with layup lines and partner passing. Give the team ONE goal, like "Spread out!" or "Find your number on defence".' },
-      { t: 'The Game day tab', d: 'It keeps track of subs for you. Tick who\'s here, pick the game length and how often to sub, then tap Start game at the tip-off. Even split shows "Subs due" with who goes off and on, so everyone plays the same time: swap them at the next whistle and tap Done. Want a different sub? Tap a girl, then the girl she swaps with, any time. Pause the timer at breaks and time-outs.' },
+      { t: 'The Game day tab', d: 'It keeps track of subs for you. Tick who\'s here, pick the game length and how often to sub, then tap Start game at the tip-off. Even split shows "Subs due" with who goes off and on, so everyone plays the same time: swap them at the next whistle and tap Done. Want a different sub? Tap a girl, then the girl she swaps with, any time. Someone hurt? Tap "A girl is hurt or resting". Pause the timer at breaks and time-outs.' },
       { t: 'Fair minutes', d: 'Everyone plays about the same amount. With 10 players: two groups of 5, swap every 5 minutes. With 8: swap 3 players every 4–5 minutes. The Game day tab works it out for you, or write it down before the game.' },
       { t: 'Time-outs', d: 'One thing, said simply: "Spread out!" or "Point at your player!" Smile. Keep it under 30 seconds.' },
       { t: 'Stay positive', d: 'Cheer effort, not just baskets: "Great hustle!", "Nice pass!" Let the referee referee.' },
