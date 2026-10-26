@@ -276,7 +276,8 @@ const Court = (() => {
       // Held while 'h' or standing still, and always in her hands just
       // after a catch and just before she passes or shoots.
       const run = holdRun(k, i);
-      let amt = k[i][2] === 'h' ? 1 : 1 - motion(ref, t);
+      let amt = 1 - motion(ref, t);
+      if (k[i][2] === 'h') amt = Math.max(amt, ease(clamp01((t - k[i][0]) / 0.03)));
       if (run.caught) amt = Math.max(amt, 1 - ease(clamp01((t - run.t0) / 0.05)));
       if (run.passes) amt = Math.max(amt, ease(clamp01((t - run.t1) / 0.05 + 1)));
       const held = heldPos(ref, t, holdAngle(k, i, t));

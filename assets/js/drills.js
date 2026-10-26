@@ -26,6 +26,10 @@ const FOCUS_ORDER = ['sense', 'ball', 'score', 'defence'];
 // Handy spots on the half court
 const TOP = [250, 330], LW = [85, 230], RW = [415, 230], LC = [45, 75], RC = [455, 75];
 
+// The same looping path one keyframe behind (keyframes evenly spaced, the
+// last one back at the first): for a player who follows and copies another.
+const behind = k => k.map(([t], j) => [t, ...k[(j + k.length - 2) % (k.length - 1)].slice(1)]);
+
 const DRILLS = [
   /* ---------------- WARM-UP GAMES ---------------- */
   {
@@ -309,6 +313,59 @@ const DRILLS = [
       key: { a: 'Passers', d: 'In the middle' },
     },
   },
+  {
+    id: 'triple-threat', name: 'Catch and Triple Threat', slot: 'skill', theme: 'ball',
+    need: { balls: 'some' },
+    steps: [
+      'Pairs with one ball, about 4 big steps apart.',
+      'Pass to your partner. She catches it with a jump stop: both feet land together.',
+      'Then "triple threat": ball on her hip, knees bent, eyes on the hoop, ready to pass, dribble or shoot.',
+      'She pivots away and back on one glued foot, then passes it back. Swap after 5 catches each.',
+      'Harder: as she catches, call "pass", "dribble" or "shoot" and she does it.',
+    ],
+    say: ['Catch and STOP!', 'Ball on your hip, eyes up', 'Pivot, don\'t walk'],
+    anim: {
+      dur: 7,
+      poster: 0.42,
+      // the catcher steps in, jump stops, holds triple threat, pivots away and back
+      p: [[150, 150], [350, -150]].flatMap(([x, turn]) => [
+        { k: [x, 180] },
+        { face: [[0, 0], [0.32, 0], [0.42, turn], [0.48, turn], [0.58, 0]], k: [[0, x, 290], [0.12, x, 290], [0.2, x, 272], [0.75, x, 272], [0.85, x, 290], [1, x, 290]] },
+      ]),
+      balls: [
+        [[0, 0], [0.08, 0], [0.2, 1, 'h'], [0.62, 1], [0.74, 0], [1, 0]],
+        [[0, 2], [0.08, 2], [0.2, 3, 'h'], [0.62, 3], [0.74, 2], [1, 2]],
+      ],
+      cap: [[0, 0.2, 'Pass. She catches with a jump stop'], [0.2, 0.32, 'Triple threat: ball on her hip, eyes up'], [0.32, 0.58, 'Pivot away and back'], [0.58, 1, 'Pass it back']],
+      key: { a: 'Partners' },
+    },
+  },
+  {
+    id: 'follow-leader', name: 'Follow the Leader', slot: 'skill', theme: 'ball',
+    need: { balls: 'each' },
+    steps: [
+      'Pairs, both with a ball. One is the leader.',
+      'The leader dribbles anywhere in the half court: fast, slow, stop, turn, swap hands.',
+      'Her partner follows about 2 big steps behind and copies everything she does.',
+      'Blow the whistle every 30 seconds to swap leaders.',
+      'Harder: weak hand only, or the leader adds a crossover.',
+    ],
+    say: ['Eyes up: watch her, not your ball', 'Copy her hand', 'Stay 2 big steps behind'],
+    anim: {
+      dur: 9,
+      // leaders loop round, followers copy one step behind
+      p: [1, -1].flatMap(side => {
+        const loop = [[145, 140], [186, 163], [212, 223], [212, 297], [186, 357], [145, 380], [104, 357], [78, 297], [78, 223], [104, 163], [145, 140]];
+        const lead = loop.map(([x, y], j) => [j / 10, side > 0 ? x : 500 - x, y]);
+        return [
+          { b: 1, hands: [[0, 'R'], [0.4, 'L'], [0.8, 'R']], k: lead },
+          { b: 1, team: 'w', hands: [[0, 'R'], [0.5, 'L'], [0.9, 'R']], k: behind(lead) },
+        ];
+      }),
+      cap: [[0, 0.5, 'Leader dribbles: fast, slow, turn, swap hands'], [0.5, 1, 'Partner copies, 2 big steps behind']],
+      key: { a: 'Leaders', w: 'Followers' },
+    },
+  },
 
   /* ---------------- SKILLS: PUT IT IN THE HOOP ---------------- */
   {
@@ -437,6 +494,70 @@ const DRILLS = [
       cap: [[0.08, 0.35, 'Dribble at the hoop'], [0.35, 0.5, 'JUMP STOP! Ball to your chin'], [0.5, 0.66, 'Up off two feet, off the backboard'], [0.66, 1, 'Rebound, dribble back around the outside']],
     },
   },
+  {
+    id: 'beat-coach', name: 'Beat the Coach', slot: 'skill', theme: 'score',
+    need: { balls: 'each', cones: 2 },
+    steps: [
+      'Put a cone each side of the hoop, about 2–3 big steps away, with a line behind each. Everyone has a ball.',
+      'Take turns, left then right: shoot from the cone, grab your own rebound and dribble round the outside to the back of your line.',
+      'Every basket = 1 point for the team. Every miss = 1 point for the coach. First to 10 wins!',
+      'While you wait, shoot your ball straight up and catch it (BEEF).',
+      'Team won easily? Everyone takes one step back next round.',
+    ],
+    say: ['Bend your knees, then shoot', 'Follow through: wave goodbye', 'Team point!'],
+    anim: {
+      dur: 8,
+      cones: [[204, 112], [296, 112]],
+      p: [
+        { k: [[0, 204, 112], [0.08, 204, 112], [0.2, 228, 82], [0.27, 228, 82], [0.34, 150, 85], [0.46, 95, 170], [0.54, 123, 217], [1, 123, 217]] },
+        { b: 1, k: [[0, 177, 147], [0.3, 177, 147], [0.42, 204, 112], [1, 204, 112]] },
+        { b: 1, k: [[0, 150, 182], [0.36, 150, 182], [0.48, 177, 147], [1, 177, 147]] },
+        { k: [[0, 296, 112], [0.48, 296, 112], [0.6, 272, 82], [0.67, 272, 82], [0.74, 350, 85], [0.86, 405, 170], [0.94, 377, 217], [1, 377, 217]] },
+        { b: 1, k: [[0, 323, 147], [0.7, 323, 147], [0.82, 296, 112], [1, 296, 112]] },
+        { b: 1, k: [[0, 350, 182], [0.76, 350, 182], [0.88, 323, 147], [1, 323, 147]] },
+      ],
+      balls: [
+        [[0, 0], [0.08, 0], [0.15, 'hoop'], [0.18, 'hoop'], [0.24, 0], [1, 0]],
+        [[0, 3], [0.48, 3], [0.55, 'hoop'], [0.58, 'hoop'], [0.64, 3], [1, 3]],
+      ],
+      cap: [[0, 0.24, 'Shoot, grab your own rebound'], [0.24, 0.5, 'Basket = team point. Miss = coach point'], [0.5, 1, 'Now the other side. First to 10 wins!']],
+    },
+  },
+  {
+    id: 'three-line-layups', name: 'Three-Line Layups', slot: 'skill', theme: 'score',
+    need: { balls: 'each' },
+    steps: [
+      'Everyone has a ball. Make 3 lines: right wing, left wing and the top of the key.',
+      'Go one at a time, in order: right, left, top. The next girl goes when the shot goes up.',
+      'Right wing: right-side layup (right, left, UP). Left wing: left-side layup (left, right, UP). Top: dribble in, jump stop, then UP.',
+      'Grab your rebound and go round the outside to the next line: right → left → top → right.',
+      'Count the team\'s baskets in 2 minutes. Beat it next round!',
+    ],
+    say: ['Right, left, UP!', 'Go when the shot goes up', 'Count out loud!'],
+    anim: {
+      dur: 12,
+      p: [
+        // right wing: layup, then along the baseline and down the side to the left line
+        { k: [[0, 415, 230], [0.02, 415, 230], [0.1, 360, 170], [0.16, 322, 122], [0.2, 292, 96], [0.26, 268, 80], [0.3, 330, 40], [0.33, 330, 16], [0.45, 18, 16], [0.52, 18, 200], [0.6, 25, 294], [1, 25, 294]] },
+        { b: 1, k: [[0, 445, 262], [0.06, 445, 262], [0.16, 415, 230], [1, 415, 230]] },
+        { b: 1, k: [[0, 475, 294], [0.08, 475, 294], [0.18, 445, 262], [1, 445, 262]] },
+        // left wing: layup, then round to the top line
+        { k: [[0, 85, 230], [0.33, 85, 230], [0.41, 140, 170], [0.47, 178, 122], [0.51, 208, 96], [0.57, 232, 80], [0.62, 170, 200], [0.72, 190, 420], [0.78, 250, 400], [1, 250, 400]] },
+        { b: 1, k: [[0, 55, 262], [0.37, 55, 262], [0.47, 85, 230], [1, 85, 230]] },
+        { b: 1, k: [[0, 25, 294], [0.39, 25, 294], [0.49, 55, 262], [1, 55, 262]] },
+        // top: jump stop finish, then round to the right line
+        { k: [[0, 250, 330], [0.62, 250, 330], [0.7, 250, 200], [0.74, 250, 125], [0.77, 250, 125], [0.79, 252, 112], [0.84, 264, 86], [0.88, 340, 110], [0.95, 480, 205], [1, 476, 294]] },
+        { b: 1, k: [[0, 250, 365], [0.66, 250, 365], [0.76, 250, 330], [1, 250, 330]] },
+        { b: 1, k: [[0, 250, 400], [0.68, 250, 400], [0.78, 250, 365], [1, 250, 365]] },
+      ],
+      balls: [
+        [[0, 0], [0.2, 0], [0.23, 'hoop'], [0.25, 'hoop'], [0.28, 0], [1, 0]],
+        [[0, 3], [0.51, 3], [0.54, 'hoop'], [0.56, 'hoop'], [0.59, 3], [1, 3]],
+        [[0, 6], [0.74, 6, 'h'], [0.79, 6], [0.81, 'hoop'], [0.83, 'hoop'], [0.86, 6], [1, 6]],
+      ],
+      cap: [[0, 0.31, 'Right wing: right, left, UP'], [0.31, 0.6, 'Left wing: left, right, UP'], [0.6, 1, 'Top: jump stop, then UP. Everyone joins the next line round']],
+    },
+  },
 
   /* ---------------- SKILLS: STOP THEM SCORING ---------------- */
   {
@@ -557,6 +678,55 @@ const DRILLS = [
       ],
       balls: [[[0, 0], [0.15, 0], [0.3, 'hoop'], [0.35, 'hoop'], [0.45, [240, 118]], [0.56, [240, 118]], [0.64, 2], [1, 2]]],
       cap: [[0, 0.2, 'Coach shoots'], [0.2, 0.52, 'Find her, turn, sit: BOX OUT!'], [0.52, 1, 'Ball bounces. Grab it with 2 hands']],
+      key: { a: 'Attackers', d: 'Defenders (bibs)' },
+    },
+  },
+  {
+    id: 'gates', name: '1 v 1 Gates', slot: 'skill', theme: 'defence',
+    need: { balls: 'some', cones: 10 },
+    steps: [
+      'Make a "gate" for each pair: 2 cones, 2 big steps apart. Spread the gates out.',
+      'The defender stands in front of her gate. The attacker starts 4 big steps away with a ball.',
+      'The attacker dribbles and tries to get through the gate. The defender slides to stay in front of her, without reaching in.',
+      'Through the gate = 1 point. Defender stops her for 5 seconds or gets the ball = 1 point. Swap jobs.',
+    ],
+    say: ['Stay in front: slide, slide!', 'Low and wide', 'No reaching: move your feet'],
+    anim: {
+      dur: 6,
+      cones: [[110, 170], [164, 170], [336, 170], [390, 170]],
+      p: [
+        { b: 1, face: 0, hands: [[0, 'R'], [0.3, 'L'], [0.52, 'R']], k: [[0, 137, 300], [0.15, 137, 262], [0.38, 92, 250], [0.6, 182, 250], [0.8, 137, 262], [1, 137, 300]] },
+        { team: 'd', k: [[0, 137, 200], [0.2, 137, 200], [0.42, 98, 200], [0.64, 176, 200], [0.84, 137, 200], [1, 137, 200]] },
+        { b: 1, face: 0, hands: [[0, 'L'], [0.34, 'R'], [0.56, 'L']], k: [[0, 363, 300], [0.15, 363, 262], [0.4, 408, 250], [0.62, 318, 250], [0.82, 363, 262], [1, 363, 300]] },
+        { team: 'd', k: [[0, 363, 200], [0.2, 363, 200], [0.44, 402, 200], [0.66, 324, 200], [0.86, 363, 200], [1, 363, 200]] },
+      ],
+      cap: [[0, 0.15, 'Attacker dribbles at the gate'], [0.15, 0.66, 'Defender slides to stay in front'], [0.66, 1, 'Stopped her! Defender\'s point']],
+      key: { a: 'Attackers', d: 'Defenders' },
+    },
+  },
+  {
+    id: 'ball-moves', name: 'Ball Moves, You Move', slot: 'skill', theme: 'defence',
+    need: { balls: 'some', bibs: true },
+    steps: [
+      '4 attackers stand on spots around the 3-point line, one with the ball. 4 defenders (in bibs), one each.',
+      'Attackers pass the ball round slowly. No dribbling, no running.',
+      'Your player has the ball? Get close: an arm\'s length away, hands up.',
+      'She doesn\'t? Take 2 big steps towards the hoop and point at her. Move every time the ball moves!',
+      'Shout "Freeze!" to check everyone\'s spot. Swap after 2 minutes. Then let the attackers cut.',
+    ],
+    say: ['Ball moves, you move!', 'Her ball? Get close', 'No ball? Step to the hoop and point'],
+    anim: {
+      dur: 12,
+      p: [
+        { k: LW }, { k: [180, 330] }, { k: [320, 330] }, { k: RW },
+        // close while her player has the ball, 2 big steps towards the hoop while she doesn't
+        { team: 'd', k: [[0, 143, 168], [0.04, 143, 168], [0.1, 107, 207], [0.2, 107, 207], [0.26, 143, 168], [1, 143, 168]] },
+        { team: 'd', k: [[0, 188, 299], [0.04, 188, 299], [0.1, 201, 248], [0.2, 201, 248], [0.26, 188, 299], [0.36, 188, 299], [0.42, 201, 248], [0.84, 201, 248], [0.9, 188, 299], [1, 188, 299]] },
+        { team: 'd', k: [[0, 299, 248], [0.36, 299, 248], [0.42, 312, 299], [0.52, 312, 299], [0.58, 299, 248], [0.68, 299, 248], [0.74, 312, 299], [0.84, 312, 299], [0.9, 299, 248], [1, 299, 248]] },
+        { team: 'd', k: [[0, 357, 168], [0.52, 357, 168], [0.58, 393, 207], [0.68, 393, 207], [0.74, 357, 168], [1, 357, 168]] },
+      ],
+      balls: [[[0, 1], [0.04, 1], [0.1, 0], [0.2, 0], [0.26, 1], [0.36, 1], [0.42, 2], [0.52, 2], [0.58, 3], [0.68, 3], [0.74, 2], [0.84, 2], [0.9, 1], [1, 1]]],
+      cap: [[0, 0.36, 'Her ball? Get close, hands up'], [0.36, 1, 'Ball moved? Step to the hoop and point at her']],
       key: { a: 'Attackers', d: 'Defenders (bibs)' },
     },
   },
@@ -686,6 +856,57 @@ const DRILLS = [
       balls: [[[0, 0, 'h'], [0.45, 0], [0.58, 1], [1, 1]]],
       cap: [[0, 0.22, 'Thrower counts: 1, 2, 3...'], [0.22, 0.45, 'Run away, then come back hard'], [0.45, 1, 'Two-hand catch, face the hoop']],
       key: { a: 'Attackers' },
+    },
+  },
+  {
+    id: 'v-cut', name: 'V-Cut and Catch', slot: 'skill', theme: 'sense',
+    need: { balls: 'some' },
+    steps: [
+      'Pairs with one ball: a passer at the top and a cutter on the wing. Use both sides.',
+      'The cutter walks 2 big steps towards the hoop. That\'s the fake.',
+      'Then she pushes off and runs straight back out to the wing with her hand up: a "V".',
+      'Pass to her hand. She catches, jump stops and turns to face the hoop.',
+      'Pass back and go again. Swap jobs after 5 goes.',
+    ],
+    say: ['Fake in, then come back hard', 'Hand up: show your target', 'Catch and face the hoop'],
+    anim: {
+      dur: 7,
+      // the cutter turns to face the hoop after the catch, then back to pass
+      p: [1, -1].flatMap(side => {
+        const x = v => (side > 0 ? v : 500 - v);
+        return [
+          { k: [x(180), 330] },
+          { face: [[0, 133 * side], [0.52, 133 * side], [0.6, 'hoop'], [0.68, 'hoop'], [0.74, 133 * side]], k: [[0, x(85), 230], [0.1, x(85), 230], [0.3, x(122), 191], [0.36, x(122), 191], [0.5, x(78), 236], [0.6, x(78), 236], [0.9, x(85), 230], [1, x(85), 230]] },
+        ];
+      }),
+      balls: [
+        [[0, 0, 'h'], [0.44, 0], [0.52, 1], [0.75, 1], [0.84, 0], [1, 0, 'h']],
+        [[0, 2, 'h'], [0.44, 2], [0.52, 3], [0.75, 3], [0.84, 2], [1, 2, 'h']],
+      ],
+      cap: [[0, 0.36, 'Walk in 2 big steps (the fake)'], [0.36, 0.52, 'Push off, come back out, hand up!'], [0.52, 0.75, 'Catch, jump stop, face the hoop'], [0.75, 1, 'Pass back. Go again']],
+    },
+  },
+  {
+    id: 'pass-cut-fill', name: 'Pass, Cut, Fill', slot: 'skill', theme: 'sense',
+    need: { balls: 'some' },
+    steps: [
+      'Groups of 4: one at the top with the ball, one on each wing, one in a corner. The other group passes in pairs at half way, and swap every 2 minutes.',
+      'Pass to a wing, then cut straight to the hoop with your hand up.',
+      'No pass back? Keep going, out to the empty corner.',
+      'Everyone else moves up a spot to fill the gap, so all the spots are full again.',
+      'Keep going: pass, cut, fill. After 4 passes, give the cutter the ball for a layup.',
+    ],
+    say: ['Pass and cut!', 'Fill the empty spot', 'Spread out: one girl per spot'],
+    anim: {
+      dur: 9,
+      p: [
+        { k: [[0, ...TOP], [0.15, ...TOP], [0.22, 268, 250], [0.35, 285, 125], [0.42, 330, 90], [0.55, ...RC], [1, ...RC]] },
+        { k: [[0, ...LW], [0.2, ...LW], [0.45, ...TOP], [1, ...TOP]] },
+        { k: RW },
+        { k: [[0, ...LC], [0.3, ...LC], [0.55, ...LW], [1, ...LW]] },
+      ],
+      balls: [[[0, 0, 'h'], [0.08, 0], [0.15, 2], [0.65, 2], [0.75, 1], [1, 1]]],
+      cap: [[0, 0.15, 'Pass to the wing'], [0.15, 0.38, 'Cut to the hoop, hand up'], [0.38, 0.6, 'No pass? Out to the empty corner. Everyone moves up a spot'], [0.6, 1, 'Spots full again. Pass and cut!']],
     },
   },
 
@@ -831,6 +1052,92 @@ const DRILLS = [
       balls: [[[0, 0], [0.22, 0, 'h'], [0.32, 1], [0.58, 1], [0.66, 'hoop'], [0.7, 'hoop'], [0.76, [250, 90]], [1, [250, 90]]]],
       cap: [[0, 0.22, '1, 2, 3 bounces...'], [0.22, 0.6, '...then pass or shoot'], [0.6, 1, 'Basket! Green team comes on next']],
       key: { a: 'Attackers' },
+    },
+  },
+  {
+    id: 'jump-stop-game', name: 'Jump Stop Game', slot: 'game', theme: 'ball',
+    need: { balls: 'some', bibs: true },
+    steps: [
+      '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes. Spare balls go in the bag so nobody trips.',
+      'Normal basketball, with one rule: every time you catch the ball, land with a jump stop.',
+      'Then triple threat: ball on your hip, eyes on the hoop, before you pass, dribble or shoot.',
+      'Travel or double dribble? The other team gets the ball. When the defence gets it, they take it out past the 3-point line.',
+      'Basket = 2 points. A great jump stop gets a shout-out!',
+    ],
+    say: ['Catch and STOP!', 'Triple threat: look first', 'Pivot, don\'t walk'],
+    anim: {
+      dur: 8,
+      p: [
+        { k: [[0, ...TOP], [1, ...TOP]] },
+        { k: LW },
+        // catches with a jump stop, faces the hoop (triple threat), then turns to pass
+        { face: [[0, -119], [0.22, -119], [0.3, 'hoop'], [0.34, 'hoop'], [0.4, 4]], k: [[0, 380, 175], [0.12, 380, 175], [0.22, 415, 238], [1, 415, 238]] },
+        { k: [[0, 440, 90], [0.4, 440, 90], [0.5, 330, 112], [1, 330, 112]] },
+        { team: 'd', guard: 0, lag: 0.03 },
+        { team: 'd', guard: 1, lag: 0.03 },
+        { team: 'd', guard: 2, lag: 0.03 },
+        { team: 'd', guard: 3, lag: 0.03 },
+      ],
+      balls: [[[0, 0], [0.12, 0], [0.22, 2, 'h'], [0.4, 2], [0.45, [420, 170]], [0.5, 3, 'h'], [0.6, 3], [0.68, 'hoop'], [0.72, 'hoop'], [0.78, [250, 92]], [1, [250, 92]]]],
+      cap: [[0, 0.22, 'Catch it with a jump stop'], [0.22, 0.4, 'Triple threat: look, then pass'], [0.4, 0.6, 'Jump stop again...'], [0.6, 1, '...and shoot!']],
+      key: { a: 'Attackers' },
+    },
+  },
+  {
+    id: 'rim-points', name: 'Rim Points', slot: 'game', theme: 'score',
+    need: { balls: 'some', bibs: true },
+    steps: [
+      '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes. Spare balls go in the bag so nobody trips.',
+      'Normal basketball, but a shot that hits the rim = 1 point, and a basket = 3 points.',
+      'So if you\'re open and close to the hoop, shoot!',
+      'Chase every missed shot: a rebound is another chance to score.',
+      'When the defence gets the ball, they take it out past the 3-point line before they attack.',
+    ],
+    say: ['Open? Shoot!', 'Bend your knees, then shoot', 'Chase the rebound!'],
+    anim: {
+      dur: 8,
+      p: [
+        { k: [[0, ...TOP], [1, ...TOP]] },
+        { k: [[0, ...RW], [0.25, 330, 150], [1, 330, 150]] },
+        { k: [[0, ...LW], [0.3, 170, 160], [0.42, 232, 108], [1, 232, 108]] },
+        { k: LC },
+        { team: 'd', guard: 0, lag: 0.03 },
+        { team: 'd', guard: 1, lag: 0.03 },
+        { team: 'd', guard: 2, lag: 0.03 },
+        { team: 'd', guard: 3, lag: 0.03 },
+      ],
+      // a bounce pass round the passer's defender; the shot hits the rim, then a put-back
+      balls: [[[0, 0], [0.15, 0], [0.2, [320, 270]], [0.25, 1, 'h'], [0.32, 1], [0.4, 'hoop'], [0.44, 'hoop'], [0.48, 2, 'h'], [0.52, 2], [0.58, 'hoop'], [0.62, 'hoop'], [0.68, [250, 90]], [1, [250, 90]]]],
+      cap: [[0, 0.32, 'Open? Shoot!'], [0.32, 0.5, 'Hit the rim = 1 point'], [0.5, 1, 'Rebound and score = 3 points']],
+      key: { a: 'Attackers' },
+    },
+  },
+  {
+    id: 'number-call', name: 'Number Call', slot: 'game', theme: 'defence',
+    need: { balls: 'some', bibs: true },
+    steps: [
+      '2 teams on opposite sidelines, numbered 1 to 5 (bibs for one team). You stand at half way with the ball.',
+      'Call a number: both girls with that number run out. Pass the ball to one of them.',
+      'She attacks the hoop. The other defends: stay between her and the hoop!',
+      'Play until there\'s a basket or the defender gets the ball. Basket = 1 point. Then back to your sideline.',
+      'Keep it quick. Once they\'ve got it, call 2 or 3 numbers at once for 2 v 2 or 3 v 3.',
+    ],
+    say: ['Stay between her and the hoop', 'Low and wide, slide your feet', 'Attack the hoop!'],
+    anim: {
+      dur: 8,
+      p: [
+        { team: 'c', k: [250, 445] },
+        // the 3s run out; blue 3 gets the pass and attacks, green 3 defends
+        ...[120, 185, 250, 315, 380].map((y, j) => (j === 2
+          ? { n: 3, k: [[0, 18, y], [0.1, 18, y], [0.24, 150, 320], [0.3, 160, 310], [0.42, 225, 200], [0.52, 262, 100], [0.6, 262, 100], [0.8, 90, 260], [1, 18, y]] }
+          : { n: j + 1, k: [18, y] })),
+        ...[120, 185, 250, 315, 380].map((y, j) => (j === 2
+          ? { team: 'w', n: 3, k: [[0, 482, y], [0.1, 482, y], [0.24, 300, 300], [0.3, 180, 272], [0.42, 231, 165], [0.52, 290, 78], [0.6, 290, 78], [0.78, 420, 200], [0.9, 482, y], [1, 482, y]] }
+          : { team: 'w', n: j + 1, k: [482, y] })),
+      ],
+      balls: [[[0, 0, 'h'], [0.22, 0], [0.3, 3], [0.52, 3], [0.58, 'hoop'], [0.62, 'hoop'], [0.68, [250, 90]], [1, [250, 90]]]],
+      cap: [[0, 0.12, '"Number 3!"'], [0.12, 0.3, 'Both 3s run out. You pass to one'], [0.3, 0.6, 'She attacks. The other defends'], [0.6, 1, 'Basket = 1 point. Back to your sideline']],
+      key: { a: 'Team 1', w: 'Team 2 (bibs)' },
     },
   },
 ];

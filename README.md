@@ -8,10 +8,10 @@ Live site: **https://databerryau.github.io/basketball-training/**
 
 | | |
 |---|---|
-| **Make today's session** | One button. You get a 60-minute plan in the same six parts every time: warm-up game, skill 1, water break, skill 2, team game, huddle. |
-| **Today's focus** | Each session works on one problem from games (bunching, turnovers, scoring or defence). The focus rotates automatically. |
+| **Make today's session** | One button. You get a 60-minute plan in the same eight parts every time: warm-up game, skill 1, drink, skill 2 (always shooting or layups), skill 3, drink, team game, huddle. |
+| **Today's focus** | Each session works on one problem from games (bunching, turnovers, scoring or defence). The focus rotates automatically, or the coach can pick a different one for the week. |
 | **Animated drills** | Every drill has a little half-court animation, numbered steps, "what to say" coaching cues and the equipment needed. |
-| **Swap** | Don't like a drill? Swap it for another one that fits the same slot. |
+| **Swap** | Don't like a drill? Swap it for another one that fits the same slot. There are 42 drills to mix in and out. |
 | **Start session** | At the court: one part per screen, a big countdown timer, beeps when time's up, and the screen stays on. If the phone reloads the page, it carries on where it was. |
 | **No internet needed** | After one visit it opens with no reception. Add it to the home screen and it opens like an app. |
 | **Coach help** | New coach basics, simple rules, basketball words and game-day tips. |

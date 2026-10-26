@@ -32,7 +32,7 @@ This spec comes from an interview with the team's parent helper (25 October 2026
 
 **Goals**
 
-- **One button.** Tap *Make today's session* and get a complete, sensible 60-minute plan. No settings, no choices.
+- **One button.** Tap *Make today's session* and get a complete, sensible 60-minute plan. No settings. (The coach *can* pick a different focus for a week, but never has to.)
 - **Clear enough for someone who has never coached.** Short sentences, numbered steps, words a 10-year-old would understand.
 - **Show, don't just tell.** Every drill has a small **animated court diagram** showing the movement.
 - **Run it at the court.** A *Start session* mode with one drill per screen, a big countdown timer and a beep when time's up.
@@ -53,19 +53,21 @@ This spec comes from an interview with the team's parent helper (25 October 2026
 
 ### 3.1 Same shape every time
 
-Every session has the same six parts, so the girls learn the routine and the coach always knows what comes next.
+Every session has the same eight parts, so the girls learn the routine and the coach always knows what comes next. After the head coach's feedback (26 October 2026), the skill drills are shorter so three fit in, and the drinks are short and more often.
 
 | # | Part | Minutes | What it is |
 |---|---|---|---|
-| 1 | **Warm-up game** | 10 | A fun, active game. Everyone moving, lots of ball touches. |
-| 2 | **Skill 1** | 12 | A drill on **today's focus**. |
-| 3 | **Water break** | 3 | Drinks. The coach sets up the next drill. |
-| 4 | **Skill 2** | 12 | A drill on a **different skill**, for variety. |
-| 5 | **Team game** | 18 | A small-sided game with one special rule that works on today's focus. |
-| 6 | **Huddle** | 5 | A question about today's focus, a shout-out, a home challenge, a team cheer. |
+| 1 | **Warm-up game** | 8 | A fun, active game. Everyone moving, lots of ball touches. |
+| 2 | **Skill 1** | 9 | A drill on **today's focus**. |
+| 3 | **Drink break** | 1 | A quick drink. The screen says what's next and what to set out. |
+| 4 | **Skill 2** | 9 | **Shooting or layups**, because every session needs some. (On a scoring day, another skill.) |
+| 5 | **Skill 3** | 9 | A drill on a **third, different skill**. |
+| 6 | **Drink break** | 1 | Another quick drink. |
+| 7 | **Team game** | 18 | A small-sided game with one special rule that works on today's focus. |
+| 8 | **Huddle** | 5 | A drink, a question about today's focus, a shout-out, a home challenge, a team cheer. |
 | | **Total** | **60** | |
 
-### 3.2 Today's focus (fully automatic)
+### 3.2 Today's focus (automatic, or the coach's pick)
 
 Each session picks **one focus**, and each focus fixes one of the game problems:
 
@@ -79,26 +81,29 @@ Each session picks **one focus**, and each focus fixes one of the game problems:
 - The focus **rotates** in that order. The first session ever is *Spread out & get open*, the most common beginner problem.
 - The focus only moves on once a session has been **run** (the timer was started, or the coach got to the end). Making a new session before running the current one keeps the same focus and picks different drills, so no focus gets skipped.
 - Some coaches only read the plan and never use *Start session*. So a session made **2 or more days ago** also counts as run when it's replaced, or their focus would never move on.
+- **Picking a focus.** Under the focus card, a small *Work on something else this week?* link opens the other focuses. Tapping one makes a new plan on it straight away (no "Are you sure?"), for a week when the last game showed the girls need something else. The rotation then carries on from that focus. It's closed until asked for, so one tap still makes the whole plan.
 - The page remembers the last focus on that phone.
 
 ### 3.3 How a session is put together
 
-1. **Focus** = the next one in the rotation (or the same one again, if the session being replaced was never run).
+1. **Focus** = the next one in the rotation (or the same one again, if the session being replaced was never run), unless the coach picked one.
 2. **Warm-up game** = any warm-up game, avoiding the ones used last session.
 3. **Skill 1** = a skill drill **for today's focus**.
-4. **Skill 2** = a skill drill **from one of the other three skills**.
-5. **Team game** = the team game that matches today's focus (or any team game if that one was used last session).
-6. **Huddle** = always the same routine, with a question and home challenge that match today's focus.
+4. **Skill 2** = a **Put it in the hoop** drill (shooting or layups). On a scoring day, a drill from one of the other skills instead.
+5. **Skill 3** = a drill from **another skill**, different from Skill 1 and Skill 2. So every session works on three of the four skills, and always includes shooting.
+6. **Team game** = a team game that matches today's focus. Every focus has two, and the one used last session is avoided.
+7. **Huddle** = always the same routine, with a question and home challenge that match today's focus.
 
-Drills used in the last session that was run, and in the session being replaced, are avoided where possible, so back-to-back sessions feel different. The exception is the team game that matches the focus: most focuses have only one, so replacing a session that wasn't run keeps it.
+Drills used in the last session that was run, and in the session being replaced, are avoided where possible, so back-to-back sessions feel different.
 
 ### 3.4 Swap a drill
 
 Every drill (warm-up, skills, team game) has a **Swap** button. It replaces that one drill with another that fits the same slot:
 
 - **Skill 1** swaps to another drill on today's focus.
-- **Skill 2** swaps to another drill on any other skill.
-- Swapping cycles through all the options before repeating.
+- **Skill 2** swaps to another shooting or layup drill (on a scoring day, another drill on a different skill).
+- **Skill 3** swaps to another drill on a skill the session isn't already working on.
+- Swapping cycles through all the options before repeating. With 7 drills for each skill, there's plenty to mix in and out.
 
 ### 3.5 Remembering
 
@@ -133,16 +138,19 @@ Every drill card has:
 
 Distances are given in **"big steps"**, not metres.
 
-### 4.1 Drill library (version 1)
+### 4.1 Drill library (version 2)
 
 | Slot | Focus | Drills |
 |---|---|---|
 | Warm-up game | (any) | Dribble Tag · Red Light, Green Light · Sharks and Minnows · Coach Says · Ball Busters · Dribble Relay |
-| Skill | Look after the ball | Cone Weave · Jump Stop and Pivot · Partner Passing · Pass and Follow · Piggy in the Middle |
-| Skill | Put it in the hoop | Layup Steps: Right-Left-Up · Layup Lines · Around the Hoop · Hot Spots · Jump Stop Finish |
-| Skill | Stop them scoring | Defence Mirror · Zig-Zag Slides · Find Your Player · Closeouts · Box Out Battle |
-| Skill | Spread out & get open | Spacing Spots · Give-and-Go · 2 v 1 · No-Dribble Keepings Off · Throw-in Practice |
-| Team game | per focus | Three-Pass Game · Freeze Game · Matchup Game · Inside Points · Rotating 3 v 3 |
+| Skill | Look after the ball | Cone Weave · Jump Stop and Pivot · Partner Passing · Pass and Follow · Piggy in the Middle · Catch and Triple Threat · Follow the Leader |
+| Skill | Put it in the hoop | Layup Steps: Right-Left-Up · Layup Lines · Around the Hoop · Hot Spots · Jump Stop Finish · Beat the Coach · Three-Line Layups |
+| Skill | Stop them scoring | Defence Mirror · Zig-Zag Slides · Find Your Player · Closeouts · Box Out Battle · 1 v 1 Gates · Ball Moves, You Move |
+| Skill | Spread out & get open | Spacing Spots · Give-and-Go · 2 v 1 · No-Dribble Keepings Off · Throw-in Practice · V-Cut and Catch · Pass, Cut, Fill |
+| Team game | Spread out & get open | Three-Pass Game · Freeze Game |
+| Team game | Look after the ball | Rotating 3 v 3 · Jump Stop Game |
+| Team game | Put it in the hoop | Inside Points · Rim Points |
+| Team game | Stop them scoring | Matchup Game · Number Call |
 | Huddle | (fixed) | Huddle and Cheer |
 
 Every drill must work for **8–10 players on a half court with 1 hoop**, using only balls, cones and bibs.
@@ -160,7 +168,7 @@ Every drill must work for **8–10 players on a half court with 1 hoop**, using 
 
 A full-screen mode for running the session live.
 
-- **One part per screen**: "Part 2 of 6 · Skill 1", the drill name, a big **countdown timer**, the animated diagram, *What to say* and *How it works*.
+- **One part per screen**: "Part 2 of 8 · Skill 1", the drill name, a big **countdown timer**, the animated diagram, *What to say* and *How it works*.
 - **Timer**: starts when the coach taps **Start**. **Pause** and **+1 min** buttons.
 - **Time's up**: two rounds of three long, loud beeps, a buzz (on phones that support it), and a **"Time's up! Tap Next"** message. The timer then counts **overtime** in red (+0:23), with a short double beep every extra minute, so the coach knows they're running over. It never skips ahead by itself.
 - **iPhone silent mode** normally mutes a web page. While the alert plays, the app asks the phone to play it anyway (where the phone supports that), and before the timer starts the iPhone run screen says to turn silent mode off. If the phone stops the sound (after a screen lock, for example), the **Tap to turn the beep back on** button comes back.
@@ -226,7 +234,7 @@ A second tab with four short sections. Each is a list of small cards, readable i
 ## 9. Done when
 
 - [ ] Opening the page on a phone shows one big **Make today's session** button and a 3-step "how it works".
-- [ ] One tap makes a 60-minute, six-part session with a clear focus and the problem it fixes.
+- [ ] One tap makes a 60-minute, eight-part session (three skill drills, two quick drinks) with a clear focus and the problem it fixes.
 - [ ] Every drill shows a working animated diagram, numbered steps, coaching cues and equipment.
 - [ ] **Swap** changes one drill and keeps the slot's rules.
 - [ ] The session is still there after closing and reopening the page.

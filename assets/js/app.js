@@ -2,15 +2,19 @@
    Easy Basketball Training: generator, plan view, run mode
    ========================================================= */
 (() => {
+  // Three short skill drills, with a quick drink after the first and the
+  // third (the huddle starts with one too).
   const SLOTS = [
-    { key: 'warmup', label: 'Warm-up game', min: 10, icon: '🔥' },
-    { key: 'skill1', label: 'Skill 1', min: 12, icon: '⭐' },
-    { key: 'water',  label: 'Water break', min: 3, icon: '💧' },
-    { key: 'skill2', label: 'Skill 2', min: 12, icon: '⭐' },
+    { key: 'warmup', label: 'Warm-up game', min: 8, icon: '🔥' },
+    { key: 'skill1', label: 'Skill 1', min: 9, icon: '⭐' },
+    { key: 'water1', label: 'Drink break', min: 1, icon: '💧', water: true },
+    { key: 'skill2', label: 'Skill 2', min: 9, icon: '⭐' },
+    { key: 'skill3', label: 'Skill 3', min: 9, icon: '⭐' },
+    { key: 'water2', label: 'Drink break', min: 1, icon: '💧', water: true },
     { key: 'game',   label: 'Team game', min: 18, icon: '🏀' },
     { key: 'huddle', label: 'Huddle', min: 5, icon: '🙌' },
   ];
-  const DRILL_SLOTS = ['warmup', 'skill1', 'skill2', 'game'];
+  const DRILL_SLOTS = ['warmup', 'skill1', 'skill2', 'skill3', 'game'];
   const byId = Object.fromEntries(DRILLS.map(d => [d.id, d]));
   const KEY_SESSION = 'ebt.session.v1';
   const KEY_HISTORY = 'ebt.history.v1';
@@ -30,12 +34,22 @@
   };
 
   /* ---------- generator ---------- */
-  function poolFor(slot, focus) {
-    if (slot === 'warmup') return DRILLS.filter(d => d.slot === 'warmup');
-    if (slot === 'skill1') return DRILLS.filter(d => d.slot === 'skill' && d.theme === focus);
-    if (slot === 'skill2') return DRILLS.filter(d => d.slot === 'skill' && d.theme !== focus);
-    if (slot === 'game') return DRILLS.filter(d => d.slot === 'game');
+  // Skill 1 is today's focus. Skill 2 is shooting or layups, because every
+  // session needs some (on a scoring day it's another skill instead).
+  // Skill 3 is a third, different skill. `s` is the session so far.
+  function themesFor(slot, s) {
+    const others = FOCUS_ORDER.filter(t => t !== s.focus);
+    const themeOf = k => byId[s.slots[k]] && byId[s.slots[k]].theme;
+    if (slot === 'skill1') return [s.focus];
+    if (slot === 'skill2') return s.focus !== 'score' ? ['score'] : others.filter(t => t !== themeOf('skill3'));
+    if (slot === 'skill3') return others.filter(t => t !== 'score' && t !== themeOf('skill2'));
     return [];
+  }
+
+  function poolFor(slot, s) {
+    if (slot === 'warmup' || slot === 'game') return DRILLS.filter(d => d.slot === slot);
+    const themes = themesFor(slot, s);
+    return DRILLS.filter(d => d.slot === 'skill' && themes.includes(d.theme));
   }
 
   function pickFrom(pool, avoid) {
@@ -47,24 +61,23 @@
 
   // `prev` is the session being replaced. The focus only moves on once a
   // session has actually been run; replacing one that wasn't keeps its
-  // focus and just picks different drills.
-  function generate(prev) {
+  // focus and just picks different drills. `chosen` is a focus the coach
+  // picked instead.
+  function generate(prev, chosen) {
     const hist = store.get(KEY_HISTORY) || {};
     const keep = prev && !prev.used && THEMES[prev.focus];
     const last = prev && prev.used ? prev.focus : hist.lastFocus;
-    const focus = keep ? prev.focus : nextFocus(last);
+    const focus = THEMES[chosen] ? chosen : keep ? prev.focus : nextFocus(last);
     const lastRun = hist.recent || [];
     const recent = lastRun.concat(prev ? Object.values(prev.slots) : []);
-    const warmup = pickFrom(poolFor('warmup'), recent);
-    const skill1 = pickFrom(poolFor('skill1', focus), recent);
-    const skill2 = pickFrom(poolFor('skill2', focus), recent);
-    // Most focuses have only one matching team game, so keep it even if the
-    // session being replaced had it. Only the last session that was run rules it out.
-    const games = poolFor('game');
+    const s = { v: 1, created: Date.now(), focus, slots: {}, seen: {} };
+    ['warmup', 'skill1', 'skill2', 'skill3'].forEach(k => { s.slots[k] = pickFrom(poolFor(k, s), recent).id; });
+    // A team game that works on today's focus, avoiding the one from the
+    // last session that was run where there's another.
+    const games = poolFor('game', s);
     const matched = games.filter(g => g.theme === focus && !lastRun.includes(g.id));
     const freshMatched = matched.filter(g => !recent.includes(g.id));
-    const game = freshMatched.length ? rand(freshMatched) : matched.length ? rand(matched) : pickFrom(games, recent);
-    const s = { v: 1, created: Date.now(), focus, slots: { warmup: warmup.id, skill1: skill1.id, skill2: skill2.id, game: game.id }, seen: {} };
+    s.slots.game = (freshMatched.length ? rand(freshMatched) : matched.length ? rand(matched) : pickFrom(games, recent)).id;
     DRILL_SLOTS.forEach(k => { s.seen[k] = [s.slots[k]]; });
     return s;
   }
@@ -72,7 +85,7 @@
   // Replaces one drill with another that fits the same slot, cycling
   // through every option before repeating.
   function swap(s, slot) {
-    const pool = poolFor(slot, s.focus);
+    const pool = poolFor(slot, s);
     const inUse = Object.values(s.slots);
     let seen = s.seen[slot] || [];
     let options = pool.filter(d => !seen.includes(d.id) && !inUse.includes(d.id));
@@ -111,9 +124,11 @@
     const s = store.get(KEY_SESSION);
     if (!s || s.v !== 1 || !THEMES[s.focus] || !s.slots) return null;
     s.seen = s.seen || {};
+    // Fills any part that's missing (a drill that's been removed, or Skill 3
+    // in a session saved before it existed).
     let fixed = false;
     DRILL_SLOTS.forEach(k => {
-      if (!byId[s.slots[k]]) { s.slots[k] = pickFrom(poolFor(k, s.focus), []).id; fixed = true; }
+      if (!byId[s.slots[k]]) { s.slots[k] = pickFrom(poolFor(k, s), Object.values(s.slots)).id; fixed = true; }
     });
     if (fixed) save(s);
     return s;
@@ -146,15 +161,18 @@
 
   // HTML for one part of the session. `opts.big` = run-mode sizing.
   function partHTML(s, slot, opts = {}) {
-    if (slot.key === 'water') {
+    if (slot.water) {
+      // A quick drink: say what's next and set it out while they drink.
+      const nextSlot = SLOTS.slice(SLOTS.indexOf(slot) + 1).find(x => DRILL_SLOTS.includes(x.key));
+      const next = nextSlot && byId[s.slots[nextSlot.key]];
       return `
         <div class="water">
           <p class="water-emoji" aria-hidden="true">💧</p>
-          <p class="lead">Drink up! Everyone gets water.</p>
+          <p class="lead">Quick drink! Everyone gets water.</p>
           <ul class="tips">
             <li>Count heads. Is everyone OK?</li>
-            <li>Set up the cones for the next drill now.</li>
-            <li>Quickly tell them the name of the next drill.</li>
+            ${next ? `<li>Next up: <b>${esc(next.name)}</b>. Tell them while they drink.</li>
+            <li>Set out: ${esc(needLine(next))}.</li>` : ''}
           </ul>
         </div>`;
     }
@@ -202,9 +220,24 @@
   const openParts = new Set(['warmup']);
 
   function partTitle(slot) {
-    if (slot.key === 'water') return 'Water break';
+    if (slot.water) return 'Drink break';
     if (slot.key === 'huddle') return HUDDLE.name;
     return byId[session.slots[slot.key]].name;
+  }
+
+  // The focus normally just rotates. This lets the coach pick another one
+  // for a week when the girls need it; it stays closed until asked for.
+  function focusChoiceHTML(themes, label) {
+    return `
+      <button type="button" class="btn btn-link" data-action="choose-focus" aria-expanded="false" aria-controls="focusChoice">${esc(label)}</button>
+      <div class="focus-choice" id="focusChoice" hidden>
+        <p class="small">Pick what the girls need most. You'll get a new plan.</p>
+        ${themes.map(t => `
+          <button type="button" class="btn btn-choice" data-focus="${t}">
+            <span class="choice-name"><span aria-hidden="true">${THEMES[t].icon}</span> ${esc(THEMES[t].name)}</span>
+            <span class="choice-fixes">Fixes: ${esc(THEMES[t].fixes.toLowerCase())}</span>
+          </button>`).join('')}
+      </div>`;
   }
 
   function renderPlan() {
@@ -219,7 +252,7 @@
           <p class="lead">One tap gives you a full <b>60-minute session</b>, with every drill explained and animated.</p>
           <button type="button" class="btn btn-big btn-primary" data-action="generate">Make today's session</button>
           <ol class="how">
-            <li><b>Tap the orange button.</b> You get a 60-minute plan in 6 parts.</li>
+            <li><b>Tap the orange button.</b> You get a 60-minute plan in ${SLOTS.length} parts.</li>
             <li><b>Have a look at home.</b> Tap any drill to see how it works.</li>
             <li><b>At the court, tap “Start session”</b> and follow the timer.</li>
           </ol>
@@ -246,6 +279,7 @@
         <p class="fixes">You ran this ${today ? 'today' : `on ${esc(day(ranAt))}`}.</p>
         <button type="button" class="btn btn-big btn-primary" data-action="generate">${today ? 'Make the next session' : 'Make today\'s session'}</button>
         <p class="next-focus">Next focus: <b><span aria-hidden="true">${next.icon}</span> ${esc(next.name)}</b></p>
+        ${focusChoiceHTML(FOCUS_ORDER.filter(t => t !== nextFocus(session.focus)), 'Work on something else?')}
         <button type="button" class="btn btn-link" data-action="run">▶ Run this session again</button>`;
     } else {
       card = `
@@ -256,8 +290,9 @@
           <p class="need-title">You'll need</p>
           <ul>${needList(session).map(n => `<li>${esc(n)}</li>`).join('')}</ul>
         </div>
-        <button type="button" class="btn btn-big btn-go" data-action="run">${resume ? `▶ Back to the session (part ${run.i + 1} of 6)` : '▶ Start session'}</button>
-        ${resume ? '<button type="button" class="btn btn-link" data-action="run-restart">Start again from the beginning</button>' : ''}`;
+        <button type="button" class="btn btn-big btn-go" data-action="run">${resume ? `▶ Back to the session (part ${run.i + 1} of ${SLOTS.length})` : '▶ Start session'}</button>
+        ${resume ? '<button type="button" class="btn btn-link" data-action="run-restart">Start again from the beginning</button>'
+          : focusChoiceHTML(FOCUS_ORDER.filter(t => t !== session.focus), 'Work on something else this week?')}`;
     }
     let clock = 0;
     root.innerHTML = `
@@ -317,16 +352,17 @@
     head.setAttribute('aria-expanded', openParts.has(key));
   }
 
-  function newSession() {
-    // A session that's been run and finished is simply replaced: the plan
-    // page offers the new one as the next step, so there's nothing to confirm.
+  // `chosen`: a focus the coach picked. Picking one is already a clear
+  // choice, and so is replacing a session that's been run and finished,
+  // so neither asks "Are you sure?".
+  function newSession(chosen) {
     const inProgress = run && !run.finished;
-    const ask = !session || (session.used && !inProgress) ? ''
+    const ask = !session || (!inProgress && (chosen || session.used)) ? ''
       : wasRun(session) ? 'Make a new session?\n\nThis one will be replaced, and the focus moves on to the next skill.'
       : 'Make a new session?\n\nYou\'ll get different drills with the same focus. The focus moves on once you\'ve used ▶ Start session.';
     if (ask && !window.confirm(ask)) return;
     if (session && !session.used && wasRun(session)) { session.used = true; save(session); }
-    session = generate(session);
+    session = generate(session, chosen);
     save(session);
     run = null;
     store.del(KEY_RUN);
@@ -721,10 +757,19 @@
       return;
     }
 
+    const pick = e.target.closest('[data-focus]');
+    if (pick) { newSession(pick.dataset.focus); return; }
+
     const act = e.target.closest('[data-action]');
     if (!act) return;
     switch (act.dataset.action) {
       case 'generate': newSession(); break;
+      case 'choose-focus': {
+        const box = $('#focusChoice');
+        box.hidden = !box.hidden;
+        act.setAttribute('aria-expanded', String(!box.hidden));
+        break;
+      }
       case 'run': startRun(false); break;
       case 'run-restart': startRun(true); break;
       case 'exit': exitRun(); break;
