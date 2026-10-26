@@ -16,8 +16,12 @@ const GameDay = (() => {
   const KEY_GAME = 'ebt.game.v1';
   const COURT = 5;
   const MAX_SQUAD = 15;
-  const STINT_MIN = 6;                        // even split: nobody plays much more than this in a row
-  const LENGTHS = [[4, 8], [4, 10], [2, 20]];   // quick picks: [periods, minutes each]
+  const SUB_EVERY = 6;                                   // even split: how often to aim to sub (minutes), unless the coach changes it
+  const EVERY_MIN = 2, EVERY_MAX = 12;
+  const LENGTHS = [[2, 18], [2, 20], [4, 8], [4, 10]];   // quick picks: [periods, minutes each]; the first is the default
+  // Each girl keeps her own colour, so she's easy to spot in the lists.
+  const COLOURS = ['#2563EB', '#DC2626', '#16A34A', '#9333EA', '#F59E0B', '#0891B2', '#DB2777', '#65A30D',
+    '#4F46E5', '#EA580C', '#0D9488', '#A16207', '#334155', '#38BDF8', '#FACC15'];
 
   const store = {
     get(key) { try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; } },
@@ -31,11 +35,24 @@ const GameDay = (() => {
 
   let root = null;
   let squad = (store.get(KEY_SQUAD) || []).filter(p => p && p.id && p.name);
-  let prefs = Object.assign({ periods: 4, mins: 10, mode: 'even', here: null }, store.get(KEY_PREFS) || {});
+  let prefs = Object.assign({ periods: LENGTHS[0][0], mins: LENGTHS[0][1], mode: 'even', subEvery: SUB_EVERY, here: null }, store.get(KEY_PREFS) || {});
   let game = loadGame();       // in progress, or finished (its summary), or null
   let screen = 'auto';          // 'auto' | 'squad' | 'setup'
   let setup = null;             // { here: [ids], starters: [ids], other: bool } while setting up
-  let picked = null;            // manual mode: the first girl tapped for a swap
+  let picked = null;            // the girl tapped first for a sub (or to mark hurt / resting)
+
+  // The lowest colour nobody else in the squad has.
+  const freeColour = () => {
+    const used = squad.map(p => p.colour);
+    const i = COLOURS.findIndex((c, j) => !used.includes(j));
+    return i < 0 ? squad.length % COLOURS.length : i;
+  };
+  // A squad saved before colours existed: give each girl hers, and keep it.
+  if (squad.some(p => !Number.isInteger(p.colour))) {
+    squad.forEach(p => { if (!Number.isInteger(p.colour)) p.colour = freeColour(); });
+    store.set(KEY_SQUAD, squad);
+  }
+  const colourOf = p => COLOURS[(p && Number.isInteger(p.colour) ? p.colour : 0) % COLOURS.length];
   let adjusting = false, adding = false;
   let ticker = null, wakeLock = null, asking = false;
 
@@ -44,7 +61,11 @@ const GameDay = (() => {
     const ok = g && g.v === 1 && Array.isArray(g.players) && Array.isArray(g.onCourt)
       && [2, 4].includes(g.periods) && g.periodSecs > 0 && g.period >= 1 && g.period <= g.periods
       && g.played && g.share && ['even', 'manual'].includes(g.mode);
-    return ok ? g : null;
+    if (!ok) return null;
+    // whole seconds only, so every girl's time ticks over together
+    ['played', 'share'].forEach(k => Object.keys(g[k]).forEach(id => { g[k][id] = Math.round(g[k][id]); }));
+    g.lastCommit = Math.round(g.lastCommit || 0);
+    return g;
   }
   const save = () => { if (game) store.set(KEY_GAME, game); };
   const saveSquad = () => store.set(KEY_SQUAD, squad);
@@ -59,12 +80,18 @@ const GameDay = (() => {
     return Math.min(game.periodSecs, Math.max(0, e));
   }
   const clockNow = () => (game.period - 1) * game.periodSecs + periodElapsed();
+  // Everything on screen counts in whole seconds of the game clock, so the
+  // clock, the next-subs countdown and every girl's minutes all tick together.
+  const clockSecs = () => Math.floor(clockNow() + 1e-6);
+  const periodSecsDone = () => Math.floor(periodElapsed() + 1e-6);
 
-  // Each quarter or half is split into equal stints of STINT_MIN minutes or less.
-  const stintSecs = g => g.periodSecs / Math.ceil(g.periodSecs / 60 / STINT_MIN - 1e-9);
+  // Each quarter or half is split into equal stints, as close as possible to
+  // how often the coach aims to sub (1 stint = subs at the breaks only).
+  const stintsPer = (mins, every) => Math.max(1, Math.round(mins / (every || SUB_EVERY)));
+  const stintSecs = g => g.periodSecs / stintsPer(g.periodSecs / 60, g.subEvery);
   function nextMoment(after) {
     const iv = stintSecs(game);
-    const t = (Math.floor(after / iv + 1e-6) + 1) * iv;
+    const t = Math.round((Math.floor(after / iv + 1e-6) + 1) * iv);   // on a whole second, like the clock
     return t < game.periodSecs - 1 ? t : null;   // the end of the period is a break, handled on its own
   }
 
@@ -75,7 +102,7 @@ const GameDay = (() => {
   // Credits the time since the last change: minutes to the girls on court,
   // and a fair share to every girl who's here.
   function commit() {
-    const now = clockNow();
+    const now = clockSecs();
     const dt = now - game.lastCommit;
     game.lastCommit = now;
     if (dt <= 0) return;
@@ -84,7 +111,7 @@ const GameDay = (() => {
     ins.forEach(p => { game.share[p.id] = (game.share[p.id] || 0) + dt * each; });
     game.onCourt.forEach(id => { game.played[id] = (game.played[id] || 0) + dt; });
   }
-  const playedNow = id => (game.played[id] || 0) + (game.onCourt.includes(id) ? Math.max(0, clockNow() - game.lastCommit) : 0);
+  const playedNow = id => (game.played[id] || 0) + (game.onCourt.includes(id) ? Math.max(0, clockSecs() - game.lastCommit) : 0);
   const owed = id => (game.played[id] || 0) - (game.share[id] || 0);   // below 0 = owed time
 
   // Even split: the girls furthest behind their share go on (on a tie,
@@ -114,9 +141,9 @@ const GameDay = (() => {
 
   /* ---------- actions ---------- */
   function startGame() {
-    const players = squad.filter(p => setup.here.includes(p.id)).map(p => ({ id: p.id, name: p.name, num: p.num || '', out: false }));
+    const players = squad.filter(p => setup.here.includes(p.id)).map(p => ({ id: p.id, name: p.name, num: p.num || '', colour: p.colour, out: false }));
     game = {
-      v: 1, created: Date.now(), periods: prefs.periods, periodSecs: prefs.mins * 60, mode: prefs.mode,
+      v: 1, created: Date.now(), periods: prefs.periods, periodSecs: prefs.mins * 60, mode: prefs.mode, subEvery: prefs.subEvery,
       players, onCourt: setup.starters.slice(), played: {}, share: {}, lastCommit: 0,
       period: 1, elapsed: 0, running: true, runStart: Date.now(), atBreak: false,
       due: null, nextSubAt: null, finished: false,
@@ -206,14 +233,17 @@ const GameDay = (() => {
     if (!d.off.length && !d.on.length) game.due = null;
   }
 
-  // Manual mode: tap a girl on the bench and the girl she replaces (either order).
+  // A sub, in either mode: tap a girl on the bench and the girl she replaces
+  // (either order). The plan never goes exactly to plan, so even split just
+  // carries on from whatever the coach did.
   function tapPlayer(id) {
-    if (game.mode !== 'manual' || game.finished) return;
+    if (game.finished) return;
     const onCourt = x => game.onCourt.includes(x);
     if (!onCourt(id) && game.onCourt.length < Math.min(COURT, here().length)) {
       commit();
       game.onCourt.push(id);   // an empty spot: straight on
       picked = null;
+      tidyDue([id]);
       return;
     }
     if (!picked || picked === id || onCourt(picked) === onCourt(id)) { picked = picked === id ? null : id; return; }
@@ -222,6 +252,20 @@ const GameDay = (() => {
     const on = onCourt(picked) ? id : picked;
     game.onCourt = game.onCourt.map(x => (x === off ? on : x));
     picked = null;
+    tidyDue([off, on]);
+  }
+
+  // After a sub the coach made, drop those girls from any "Subs due"
+  // suggestion, keeping the rest of it (as many off as on).
+  function tidyDue(ids) {
+    const d = game.due;
+    if (!d) return;
+    d.off = d.off.filter(x => !ids.includes(x) && game.onCourt.includes(x));
+    d.on = d.on.filter(x => !ids.includes(x) && !game.onCourt.includes(x));
+    const spots = Math.max(0, Math.min(COURT, here().length) - game.onCourt.length);
+    while (d.on.length > d.off.length + spots) d.on.pop();
+    while (d.off.length > d.on.length) d.off.pop();
+    if (!d.off.length && !d.on.length) game.due = null;
   }
 
   function setOut(id, out) {
@@ -238,7 +282,7 @@ const GameDay = (() => {
 
   function addPlayer(p) {
     commit();
-    if (!game.players.some(x => x.id === p.id)) game.players.push({ id: p.id, name: p.name, num: p.num || '', out: false });
+    if (!game.players.some(x => x.id === p.id)) game.players.push({ id: p.id, name: p.name, num: p.num || '', colour: p.colour, out: false });
     else player(p.id).out = false;
     fillGaps();
   }
@@ -268,7 +312,7 @@ const GameDay = (() => {
     name = name.trim().slice(0, 20);
     num = String(num || '').replace(/\D/g, '').slice(0, 2);
     if (!name || squad.length >= MAX_SQUAD) return null;
-    const p = { id: uid(), name, num };
+    const p = { id: uid(), name, num, colour: freeColour() };
     squad.push(p);
     saveSquad();
     return p;
@@ -288,7 +332,7 @@ const GameDay = (() => {
     }
     if (changed) { save(); render(); } else updateLive();
   }
-  function startTicking() { clearInterval(ticker); ticker = setInterval(tick, 500); }
+  function startTicking() { clearInterval(ticker); ticker = setInterval(tick, 250); }
   function stopTicking() { clearInterval(ticker); ticker = null; }
 
   // The screen stays on while a game is on (where the phone allows it).
@@ -318,6 +362,9 @@ const GameDay = (() => {
     else root.innerHTML = setupHTML();
   }
 
+  const dot = p => `<i class="gd-dot" style="background:${colourOf(p)}" aria-hidden="true"></i>`;
+  const nameHTML = p => `${esc(p.name)}${p.num ? ` <small>#${esc(p.num)}</small>` : ''}`;
+
   const intro = `
     <h1 class="gd-title">Game day</h1>
     <p class="lead">Keeps track of subs and minutes during a game, so every girl gets a fair go.</p>`;
@@ -328,7 +375,7 @@ const GameDay = (() => {
         <h2 class="gd-h">Your squad</h2>
         <p class="small">First names, and jersey numbers if you like. Saved on this phone only, never sent anywhere.</p>
         ${squad.length ? `<ul class="gd-squad">${squad.map(p => `
-          <li><span class="gd-name">${esc(p.name)}${p.num ? ` <small>#${esc(p.num)}</small>` : ''}</span>
+          <li><span class="gd-name">${dot(p)}${nameHTML(p)}</span>
             <button type="button" class="gd-x" data-gd="remove" data-id="${esc(p.id)}" aria-label="Remove ${esc(p.name)}">✕</button></li>`).join('')}</ul>` : ''}
         ${squad.length < MAX_SQUAD ? `
           <form class="gd-add" data-gd-form="squad">
@@ -356,11 +403,41 @@ const GameDay = (() => {
     tidyStarters();
   }
 
+  const minutesText = m => (Number.isInteger(m) ? `${m} minutes` : Number.isInteger(m * 2) ? `${Math.floor(m)}½ minutes` : `${Math.floor(m)} min ${Math.round((m % 1) * 60)} sec`);
+
+  function subPlanText() {
+    const n = stintsPer(prefs.mins, prefs.subEvery);
+    const each = prefs.periods === 2 ? 'half' : 'quarter';
+    const breaks = prefs.periods === 2 ? 'half time' : 'each break';
+    if (n === 1) return `Subs at ${breaks} only.`;
+    return `Subs every ${minutesText(prefs.mins / n)}: ${n - 1} in each ${each}, plus ${breaks}.`;
+  }
+
+  // Whether the chosen interval splits the time evenly for the girls who are
+  // here (5 on court, so the turns must share out exactly), and if not, the
+  // nearest interval that would.
+  function evennessHTML() {
+    const n = setup.here.length;
+    if (n <= COURT) return '<p class="gd-even is-ok">Everyone\'s on court the whole game.</p>';
+    const turns = e => prefs.periods * stintsPer(prefs.mins, e) * COURT;
+    if (turns(prefs.subEvery) % n === 0) {
+      const each = Math.round(prefs.periods * prefs.mins * COURT / n * 10) / 10;
+      return `<p class="gd-even is-ok">✓ With ${n} girls, everyone gets the same time: ${each} minutes each.</p>`;
+    }
+    const better = [];
+    for (let e = EVERY_MIN; e <= EVERY_MAX; e++) if (turns(e) % n === 0) better.push(e);
+    better.sort((a, b) => Math.abs(a - prefs.subEvery) - Math.abs(b - prefs.subEvery) || a - b);
+    const extra = minutesText(prefs.mins / stintsPer(prefs.mins, prefs.subEvery));
+    return `<div class="gd-even">
+      <p>With ${n} girls this doesn't share out exactly: some girls will get one more turn than others (${extra}).</p>
+      ${better.length ? `<button type="button" class="btn btn-ghost" data-gd="every-set" data-e="${better[0]}">Sub every ${better[0]} min instead (even time)</button>` : ''}
+    </div>`;
+  }
+
   function setupHTML() {
     if (!setup) freshSetup();
-    const iv = Math.round(stintSecs({ periodSecs: prefs.mins * 60 }) / 60 * 10) / 10;
     const want = Math.min(COURT, setup.here.length);
-    const chip = (p, on, action) => `<button type="button" class="gd-chip" data-gd="${action}" data-id="${esc(p.id)}" aria-pressed="${on}">${esc(p.name)}${p.num ? ` <small>#${esc(p.num)}</small>` : ''}</button>`;
+    const chip = (p, on, action) => `<button type="button" class="gd-chip" data-gd="${action}" data-id="${esc(p.id)}" aria-pressed="${on}">${dot(p)}${nameHTML(p)}</button>`;
     return `${intro}
       <div class="card gd-card">
         <h2 class="gd-h">Who's here?</h2>
@@ -389,9 +466,16 @@ const GameDay = (() => {
           <button type="button" data-gd="mode" data-mode="even" aria-pressed="${prefs.mode === 'even'}">Even split</button>
           <button type="button" data-gd="mode" data-mode="manual" aria-pressed="${prefs.mode === 'manual'}">Manual</button>
         </div>
-        <p class="small">${prefs.mode === 'even'
-          ? `The app tells you who goes on and off about every ${iv} minutes, so everyone plays the same time.`
-          : 'You choose who goes on and off. The app counts everyone\'s minutes.'}</p>
+        ${prefs.mode === 'even' ? `
+          <div class="gd-every">
+            <span>Sub about every</span>
+            <button type="button" class="gd-step" data-gd="every" data-d="-1" aria-label="Sub more often" ${prefs.subEvery <= EVERY_MIN ? 'disabled' : ''}>−</button>
+            <b>${prefs.subEvery} min</b>
+            <button type="button" class="gd-step" data-gd="every" data-d="1" aria-label="Sub less often" ${prefs.subEvery >= EVERY_MAX ? 'disabled' : ''}>+</button>
+          </div>
+          <p class="small">${subPlanText()} The app says who goes on and off.</p>
+          ${evennessHTML()}`
+          : '<p class="small">You choose who goes on and off. The app counts everyone\'s minutes.</p>'}
       </div>
       <div class="card gd-card">
         <h2 class="gd-h">Starting five <span class="gd-count">${setup.starters.length} of ${want}</span></h2>
@@ -405,7 +489,7 @@ const GameDay = (() => {
 
   function minutesList() {
     const rows = game.players.slice().sort((a, b) => (game.played[b.id] || 0) - (game.played[a.id] || 0));
-    return `<ol class="gd-summary">${rows.map(p => `<li><span>${esc(p.name)}${p.num ? ` <small>#${esc(p.num)}</small>` : ''}</span><b>${Math.round((game.played[p.id] || 0) / 60)} min</b></li>`).join('')}</ol>`;
+    return `<ol class="gd-summary">${rows.map(p => `<li style="--pc:${colourOf(p)}"><span>${nameHTML(p)}</span><b>${Math.round((game.played[p.id] || 0) / 60)} min</b></li>`).join('')}</ol>`;
   }
 
   function summaryHTML() {
@@ -416,22 +500,57 @@ const GameDay = (() => {
       <button type="button" class="btn btn-big btn-primary" data-gd="new-game">New game</button>`;
   }
 
+  // How far her minutes bar reaches: full = whoever's played the most so far.
+  function barPct(id) {
+    const most = Math.max(1, ...game.players.map(p => playedNow(p.id)));
+    return Math.round(playedNow(id) / most * 100);
+  }
+
+  // Each girl's row: her colour down the side, and a bar in her colour that
+  // fills with her minutes, so it's easy to see at a glance who's behind.
+  // Tap the row to sub her.
   function rowHTML(p, where) {
-    const out = where === 'out';
+    const style = `--pc:${colourOf(p)}`;
+    const mins = `<span class="gd-mins" data-min="${esc(p.id)}">${fmt(playedNow(p.id))}</span>`;
+    if (where === 'out') {
+      return `
+        <li class="gd-row is-out" style="${style}">
+          <span class="gd-who"><span class="gd-name">${nameHTML(p)}</span>${mins}</span>
+          <button type="button" class="gd-back" data-gd="back" data-id="${esc(p.id)}">Back in</button>
+        </li>`;
+    }
+    const on = picked === p.id;
     return `
-      <li class="gd-row${picked === p.id ? ' is-picked' : ''}">
-        <button type="button" class="gd-who" data-gd="tap" data-id="${esc(p.id)}" ${game.mode === 'manual' && !out ? '' : 'tabindex="-1"'}>
-          <span class="gd-name">${esc(p.name)}${p.num ? ` <small>#${esc(p.num)}</small>` : ''}</span>
-          <span class="gd-mins" data-min="${esc(p.id)}">${fmt(playedNow(p.id))}</span>
+      <li class="gd-row${on ? ' is-picked' : ''}" style="${style}">
+        <button type="button" class="gd-who" data-gd="tap" data-id="${esc(p.id)}" aria-pressed="${on}">
+          <span class="gd-bar" data-bar="${esc(p.id)}" style="width:${barPct(p.id)}%"></span>
+          <span class="gd-name">${nameHTML(p)}</span>
+          ${mins}
+          <span class="gd-sub" aria-hidden="true">${on ? 'Picked' : 'Sub'}</span>
         </button>
-        <button type="button" class="gd-out" data-gd="${out ? 'back' : 'out'}" data-id="${esc(p.id)}" aria-label="${esc(p.name)}: ${out ? 'back in' : 'out of the game'}">${out ? 'Back in' : 'Out'}</button>
       </li>`;
+  }
+
+  // After the first tap: who to tap next, or mark her hurt / resting.
+  function pickedHTML(empty) {
+    if (!picked || !player(picked)) return '';
+    const p = player(picked);
+    const onCourt = game.onCourt.includes(picked);
+    const next = onCourt ? 'tap the girl coming on.' : empty > 0 ? 'tap the girl she replaces (or nobody: she fills the empty spot).' : 'tap the girl she replaces.';
+    return `
+      <div class="gd-picked" style="--pc:${colourOf(p)}">
+        <p><b>Sub ${esc(p.name)} ${onCourt ? 'off' : 'on'}:</b> ${next}</p>
+        <div class="gd-picked-btns">
+          <button type="button" class="btn btn-ghost" data-gd="hurt">${esc(p.name)} is hurt or resting</button>
+          <button type="button" class="btn btn-link" data-gd="unpick">Cancel</button>
+        </div>
+      </div>`;
   }
 
   function dueHTML() {
     const d = game.due;
     if (!d) return '';
-    const names = ids => ids.map(id => `<button type="button" class="gd-due-name" data-gd="due-tap" data-id="${esc(id)}">${esc(player(id).name)}</button>`).join('') || '<span class="gd-due-none">nobody</span>';
+    const names = ids => ids.map(id => `<button type="button" class="gd-due-name" style="--pc:${colourOf(player(id))}" data-gd="due-tap" data-id="${esc(id)}">${esc(player(id).name)}</button>`).join('') || '<span class="gd-due-none">nobody</span>';
     return `
       <div class="gd-due">
         <p class="gd-due-title">Subs due</p>
@@ -450,15 +569,15 @@ const GameDay = (() => {
     const bench = here().filter(p => !game.onCourt.includes(p.id));
     const out = game.players.filter(p => p.out);
     const empty = Math.min(COURT, here().length) - court.length;
-    const squadLeft = squad.filter(p => !game.players.some(x => x.id === p.id));   // anyone out is in "Out of the game"
-    const hint = game.mode !== 'manual' ? ''
-      : picked ? `Now tap the girl to swap with ${esc(player(picked).name)}.`
+    const squadLeft = squad.filter(p => !game.players.some(x => x.id === p.id));   // anyone hurt or resting is listed already
+    const hint = picked ? ''
       : empty > 0 ? 'Tap a girl on the bench to fill the empty spot.'
-      : 'Tap a girl on the bench, then the girl she\'s replacing.';
+      : game.mode === 'even' ? 'Sub any time: tap a girl on the bench, then the girl she replaces.'
+      : 'To sub, tap a girl on the bench, then the girl she replaces.';
     return `
       <div class="card gd-clock-card">
         <p class="eyebrow">${periodName(game, game.period)} of ${game.periods}${game.atBreak ? ' · finished' : ''}</p>
-        <button type="button" class="gd-clock${game.running ? '' : ' is-paused'}" id="gdClock" data-gd="adjust-toggle" aria-label="Time left in the ${periodWord(game).toLowerCase()}. Tap to adjust">${fmt(game.periodSecs - periodElapsed())}</button>
+        <button type="button" class="gd-clock${game.running ? '' : ' is-paused'}" id="gdClock" data-gd="adjust-toggle" aria-label="Time left in the ${periodWord(game).toLowerCase()}. Tap to adjust">${fmt(game.periodSecs - periodSecsDone())}</button>
         <p class="gd-next" id="gdNext">${nextText()}</p>
         ${adjusting && !game.atBreak ? `<div class="gd-adjust" role="group" aria-label="Adjust the timer">
           ${[-30, -10, 10, 30].map(s => `<button type="button" data-gd="adjust" data-s="${s}">${s > 0 ? '+' : '−'}${Math.abs(s)}s</button>`).join('')}</div>` : ''}
@@ -471,7 +590,8 @@ const GameDay = (() => {
       <ul class="gd-list">${court.map(p => rowHTML(p, 'court')).join('')}${empty > 0 ? '<li class="gd-row gd-empty">Empty spot</li>'.repeat(empty) : ''}</ul>
       <h2 class="gd-list-title">Bench</h2>
       <ul class="gd-list">${bench.length ? bench.map(p => rowHTML(p, 'bench')).join('') : '<li class="gd-row gd-empty">Nobody</li>'}</ul>
-      ${out.length ? `<h2 class="gd-list-title">Out of the game</h2><ul class="gd-list">${out.map(p => rowHTML(p, 'out')).join('')}</ul>` : ''}
+      ${out.length ? `<h2 class="gd-list-title">Hurt or resting</h2><ul class="gd-list">${out.map(p => rowHTML(p, 'out')).join('')}</ul>` : ''}
+      ${pickedHTML(empty)}
       <div class="card gd-card gd-tools">
         <div class="gd-seg" role="group" aria-label="How subs work">
           <button type="button" data-gd="mode" data-mode="even" aria-pressed="${game.mode === 'even'}">Even split</button>
@@ -493,18 +613,19 @@ const GameDay = (() => {
     if (game.atBreak) return game.period + 1 === game.periods ? 'Last one to go' : 'Break';
     if (game.mode !== 'even' || here().length <= COURT) return game.mode === 'even' ? 'Everyone\'s on: no subs needed' : '';
     if (game.due) return 'Subs due now';
-    const left = game.nextSubAt == null ? game.periodSecs - periodElapsed() : game.nextSubAt - periodElapsed();
+    const left = game.nextSubAt == null ? game.periodSecs - periodSecsDone() : game.nextSubAt - periodSecsDone();
     return `Next subs in ${fmt(left)}`;
   }
 
-  // Every half second: just the numbers that change.
+  // Four times a second: just the numbers that change (all from the same whole second).
   function updateLive() {
     if (!root || !live() || root.closest('[hidden]')) return;
     const clock = $('#gdClock');
     if (!clock) return;
-    clock.textContent = fmt(game.periodSecs - periodElapsed());
+    clock.textContent = fmt(game.periodSecs - periodSecsDone());
     $('#gdNext').textContent = nextText();
     root.querySelectorAll('[data-min]').forEach(n => { n.textContent = fmt(playedNow(n.dataset.min)); });
+    root.querySelectorAll('[data-bar]').forEach(n => { n.style.width = `${barPct(n.dataset.bar)}%`; });
   }
 
   /* ---------- taps ---------- */
@@ -532,6 +653,8 @@ const GameDay = (() => {
       case 'length': prefs.periods = +b.dataset.n; prefs.mins = +b.dataset.m; setup.other = false; savePrefs(); break;
       case 'length-other': setup.other = true; break;
       case 'periods': prefs.periods = +b.dataset.n; savePrefs(); break;
+      case 'every-set': prefs.subEvery = +b.dataset.e; savePrefs(); break;
+      case 'every': prefs.subEvery = Math.min(EVERY_MAX, Math.max(EVERY_MIN, (prefs.subEvery || SUB_EVERY) + +b.dataset.d)); savePrefs(); break;
       case 'mode':
         if (live()) setMode(b.dataset.mode);
         else { prefs.mode = b.dataset.mode; savePrefs(); }
@@ -544,7 +667,8 @@ const GameDay = (() => {
       case 'done': doneSubs(); break;
       case 'due-tap': changeDue(id); break;
       case 'tap': tapPlayer(id); break;
-      case 'out': setOut(id, true); break;
+      case 'hurt': if (picked) setOut(picked, true); picked = null; break;
+      case 'unpick': picked = null; break;
       case 'back': setOut(id, false); break;
       case 'add-toggle': adding = !adding; break;
       case 'arrive': addPlayer(squad.find(p => p.id === id)); adding = false; break;

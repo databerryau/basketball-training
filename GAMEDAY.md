@@ -39,10 +39,12 @@ The coach is watching the game, not the phone. Everything has to work at a glanc
 ### 3.2 Each game
 
 1. **Tick who's here.**
-2. **Game length**: 4 quarters or 2 halves, and how many minutes each. Quick picks: *4 × 8*, *4 × 10*, *2 × 20*, or type your own. The last choice is remembered.
+2. **Game length**: 2 halves or 4 quarters, and how many minutes each. Quick picks: *2 × 18* (the default), *2 × 20*, *4 × 8*, *4 × 10*, or type your own. The last choice is remembered.
 3. **Mode**: **Even split** (the default) or **Manual** (for more serious teams).
-4. **Starting five**: the app picks one (even split) and the coach can tap to change it. In manual mode the coach picks.
-5. Tap **Start game** at the tip-off.
+4. **How often to sub** (even split): *Sub about every [−] 6 min [+]*, from 2 to 12 minutes. The app splits each half or quarter into equal stints as close to that as it can, and says what that means: "Subs every 4½ minutes: 3 in each half, plus half time".
+   - It also says whether that **shares out evenly** for the girls who are here: "✓ With 8 girls, everyone gets the same time: 22.5 minutes each". If it doesn't (say 2 × 18 subbing every 6 with 8 girls: 6 turns of 6 minutes can't split 8 ways), it says so and offers the nearest interval that does, as one tap: *Sub every 5 min instead (even time)*.
+5. **Starting five**: the app picks one (even split) and the coach can tap to change it. In manual mode the coach picks.
+6. Tap **Start game** at the tip-off.
 
 ---
 
@@ -52,45 +54,53 @@ The coach is watching the game, not the phone. Everything has to work at a glanc
 
 - **The period and the time**: "Quarter 2 · 6:40 left". This is the app's own timer, not the scoreboard.
 - **Pause / Resume**: for breaks, time-outs and long stoppages.
-- **On court**: the 5 girls playing, each with her minutes so far.
-- **Bench**: everyone else, with her minutes so far.
+- **On court**: the 5 girls playing. **Bench**: everyone else. **Hurt or resting**: anyone who can't play right now.
+- **Each girl has her own colour**, kept from game to game: a stripe down the side of her row, and a bar in her colour that fills with her minutes (full = whoever's played most so far), so it's easy to see at a glance who's behind. Her colour is also on the *Subs due* panel, the setup chips and the summary.
+- **Every time ticks together**: the clock, "Next subs in" and every girl's minutes all count in whole seconds of the game clock, so they all change at the same moment.
+- **Each row says Sub**: tap a girl to make a sub (see 4.3).
 - At the end of a quarter or half the timer stops: *"End of quarter 1. Tap Start for quarter 2."*
 
 ### 4.2 Even split
 
 Everyone gets the same time on court, as near as possible.
 
-- **When subs happen**: at every break between quarters or halves, and part-way through each one, so nobody plays much more than **6 minutes in a row**. Each quarter or half is split into equal parts of 6 minutes or less:
+- **When subs happen**: at every break between quarters or halves, and part-way through each one, as often as the coach chose (3.2). Each quarter or half is split into equal stints as close to that as possible:
 
-  | Game | Subs |
-  |---|---|
-  | 4 × 8 | half way through each quarter (every 4 minutes) and at each break |
-  | 4 × 10 | half way through each quarter (every 5 minutes) and at each break |
-  | 2 × 20 | every 5 minutes, and at half time |
+  | Game | Sub about every | Subs |
+  |---|---|---|
+  | 2 × 18 | 6 min (default) | every 6 minutes: 2 in each half, plus half time |
+  | 2 × 18 | 5 min | every 4½ minutes: 3 in each half, plus half time |
+  | 4 × 10 | 5 min | half way through each quarter, and at each break |
+  | 4 × 8 | 6 min | at each break only; choose 4 to sub half way through each quarter too |
 
 - **Who goes on**: at each sub moment, the girls who've played the **fewest minutes** come on and the girls who've played the **most** come off. (Strictly, it's minutes compared with a fair share of the time she's been here, so a late arrival or a girl back from a rest gets a fair share of what's left, without the others sitting out to make up her missed time.)
-- **How even it ends up**: with 8 or 10 girls, everyone ends within about 2 minutes of each other (exactly equal if the coach taps *Done* straight away). With 6, 7, 9 or 11, the minutes can't divide evenly into the sub moments, so some girls get one more stint than others (4–6 minutes, depending on the game length). Checked by simulating thousands of games.
+- **How even it ends up**: when setup shows the green "everyone gets the same time", everyone ends within about 2 minutes of each other (exactly equal if the coach taps *Done* straight away; the rest is time spent waiting for a whistle). Otherwise some girls get one more stint than others, which setup warns about. Checked by simulating thousands of games.
 - **When subs are due**: no sound. The screen changes to a big orange **Subs due** panel:
 
   > **OFF:** Mia, Zoe → **ON:** Ava, Lily
 
   The timer keeps running. The coach makes the change at the next whistle and taps **Done**. Minutes are counted from *Done*, so time spent waiting for a whistle is fair to everyone.
-- **Coach knows best**: tap a name on the panel to swap who goes on or off. The plan works around it.
+- **Coach knows best**: tap a name on the panel to swap who goes on or off. Or ignore the panel and make a different sub (4.3). The plan never goes exactly to plan, so it simply carries on from whatever happened.
 
-### 4.3 Manual
+### 4.3 Making a sub (both modes)
+
+- Tap a girl (her row says **Sub**), then the girl she swaps with: one on the bench and one on court, in either order. That's a sub.
+- After the first tap, a bar in her colour stays at the bottom of the screen: *"Sub Ella off: tap the girl coming on."*, with **Cancel**.
+- In even split, a sub the coach makes takes those girls out of any *Subs due* suggestion, and the next sub moment plans from there.
+
+### 4.4 Manual
 
 For teams that want the coach to decide.
 
-- Tap a girl on the bench, then the girl she's replacing. That's a sub.
-- Each girl's **minutes played** count up live. Nothing else: no suggestions, no warnings.
+- Subs as in 4.3. Each girl's **minutes played** count up live. Nothing else: no suggestions, no warnings.
 - The coach can switch between *Even split* and *Manual* at any time. Going back to even split plans the rest of the game from now.
 
-### 4.4 Changes during the game
+### 4.5 Changes during the game
 
 - **Late arrival**: tap *＋ A girl arrived late* and pick her from the squad (or type a new name). She joins the bench, and the even split re-plans the rest of the game so everyone still gets a fair share.
-- **Hurt, or needs a rest**: tap *Out* beside her name (and *Back in* later). If she was on court, the even split straight away asks for a replacement ("Subs due: ON …"). The plan re-balances from now.
+- **Hurt, or needs a rest**: tap her, then **[Name] is hurt or resting** on the bar at the bottom. She moves to *Hurt or resting*, with a **Back in** button for later. If she was on court, the even split straight away asks for a replacement ("Subs due: ON …"). The plan re-balances from now. (This used to be an *Out* button on every row, which was too easy to mistake for "sub off".)
 
-### 4.5 Safe if the page reloads
+### 4.6 Safe if the page reloads
 
 Like *Start session*: the game is saved after every tap, so if the phone reloads the page it carries on at the same point, with the timer where it should be.
 
@@ -124,7 +134,7 @@ Like *Start session*: the game is saved after every tap, so if the phone reloads
 
 Built this way; easy to change:
 
-1. **When subs happen**: every break, plus equal parts of 6 minutes or less (the table in 4.2). For 4 × 8 that means subs every 4 minutes, not 8.
+1. **When subs happen**: every break, plus equal stints as close as possible to the coach's "sub about every" (6 minutes unless changed).
 2. **Minutes count from Done**, not from when the panel appears.
 3. **The app suggests the starting five** in even split; the coach can change it.
 4. **Optional jersey numbers**, alongside first names.
@@ -138,8 +148,9 @@ Built this way; easy to change:
 
 - [x] A *Game day* tab sits next to *Session* and *Coach help* (on a phone the three tabs get their own row under the name).
 - [x] The squad is saved on the phone; each game the coach ticks who's here, picks the game length and mode, and starts.
-- [x] Even split shows **Subs due** with who's off and on at the right moments, silently, and *Done* swaps them.
-- [x] At the end of a game played in even split with 8 or 10 girls, every girl's minutes are within about 2 minutes of each other (when nobody arrived late or got hurt). Other squad sizes: within one stint.
+- [x] Even split shows **Subs due** with who's off and on at the right moments, silently, and *Done* swaps them. The coach can also make any sub at any time.
+- [x] At the end of a game played in even split, when setup said "everyone gets the same time", every girl's minutes are within about 2 minutes of each other (when nobody arrived late or got hurt). Otherwise within one stint, as setup warned.
+- [x] Each girl has her own colour and a minutes bar, and every time on screen ticks over together.
 - [x] Manual mode swaps any girl with a tap and counts each girl's minutes.
 - [x] Late arrivals and injuries re-balance the rest of the game.
 - [x] Pause, end-of-period stops and reload-safety all work, with the screen kept on.
