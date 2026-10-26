@@ -46,8 +46,10 @@
     if (slot === 'skill2' && s.focus !== 'score') return ['score'];
     const themeOf = k => byId[s.slots[k]] && byId[s.slots[k]].theme;
     const taken = ['skill2', 'skill3', 'skill4'].filter(k => k !== slot).map(themeOf);
-    return FOCUS_ORDER.filter(t => t !== s.focus && !taken.includes(t)
-      && (slot === 'skill2' || s.focus === 'score' || t !== 'score'));
+    const others = FOCUS_ORDER.filter(t => t !== s.focus);
+    const themes = others.filter(t => !taken.includes(t) && (slot === 'skill2' || s.focus === 'score' || t !== 'score'));
+    // Never come up empty, even if the other slots don't follow the rules.
+    return themes.length ? themes : others;
   }
 
   function poolFor(slot, s) {
@@ -129,16 +131,29 @@
 
   function load() {
     const s = store.get(KEY_SESSION);
-    if (!s || s.v !== 1 || !THEMES[s.focus] || !s.slots) return null;
-    s.seen = s.seen || {};
-    // Fills any part that's missing (a drill that's been removed, or a
-    // skill slot in a session saved by an older version with fewer).
-    let fixed = false;
-    DRILL_SLOTS.forEach(k => {
-      if (!byId[s.slots[k]]) { s.slots[k] = pickFrom(poolFor(k, s), [], Object.values(s.slots)).id; fixed = true; }
-    });
-    if (fixed) save(s);
-    return s;
+    if (!s || s.v !== 1 || !THEMES[s.focus] || !s.slots || typeof s.slots !== 'object') return null;
+    try {
+      s.seen = s.seen && typeof s.seen === 'object' ? s.seen : {};
+      // Sessions saved by older versions had fewer skill slots, picked by
+      // different rules. Clear any drill that doesn't fit its slot now, or
+      // is already in an earlier slot (in order, so each is judged against
+      // the ones before it)...
+      let fixed = false;
+      const fits = (k, d) => (SKILL_SLOTS.includes(k) ? d.slot === 'skill' && themesFor(k, s).includes(d.theme) : d.slot === k);
+      DRILL_SLOTS.forEach((k, i) => {
+        const d = byId[s.slots[k]];
+        const earlier = DRILL_SLOTS.slice(0, i).map(j => s.slots[j]);
+        if (d && (!fits(k, d) || earlier.includes(d.id))) { delete s.slots[k]; fixed = true; }
+      });
+      // ...then fill every part that's missing (or a drill that's been removed).
+      DRILL_SLOTS.forEach(k => {
+        if (!byId[s.slots[k]]) { s.slots[k] = pickFrom(poolFor(k, s), [], Object.values(s.slots)).id; fixed = true; }
+      });
+      if (fixed) save(s);
+      return s;
+    } catch (e) {
+      return null;   // a saved session we can't make sense of: start fresh rather than break the page
+    }
   }
 
   /* ---------- shared bits ---------- */
