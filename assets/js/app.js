@@ -2,19 +2,22 @@
    Easy Basketball Training: generator, plan view, run mode
    ========================================================= */
 (() => {
-  // Three short skill drills, with a quick drink after the first and the
-  // third (the huddle starts with one too).
+  // Five short skill drills keep the girls interested, with a quick drink
+  // after every two (the huddle starts with one too), then a short team game.
   const SLOTS = [
-    { key: 'warmup', label: 'Warm-up game', min: 8, icon: '🔥' },
-    { key: 'skill1', label: 'Skill 1', min: 9, icon: '⭐' },
+    { key: 'warmup', label: 'Warm-up game', min: 6, icon: '🔥' },
+    { key: 'skill1', label: 'Skill 1', min: 7, icon: '⭐' },
+    { key: 'skill2', label: 'Skill 2', min: 7, icon: '⭐' },
     { key: 'water1', label: 'Drink break', min: 1, icon: '💧', water: true },
-    { key: 'skill2', label: 'Skill 2', min: 9, icon: '⭐' },
-    { key: 'skill3', label: 'Skill 3', min: 9, icon: '⭐' },
+    { key: 'skill3', label: 'Skill 3', min: 7, icon: '⭐' },
+    { key: 'skill4', label: 'Skill 4', min: 7, icon: '⭐' },
     { key: 'water2', label: 'Drink break', min: 1, icon: '💧', water: true },
-    { key: 'game',   label: 'Team game', min: 18, icon: '🏀' },
+    { key: 'skill5', label: 'Skill 5', min: 7, icon: '⭐' },
+    { key: 'game',   label: 'Team game', min: 12, icon: '🏀' },
     { key: 'huddle', label: 'Huddle', min: 5, icon: '🙌' },
   ];
-  const DRILL_SLOTS = ['warmup', 'skill1', 'skill2', 'skill3', 'game'];
+  const SKILL_SLOTS = ['skill1', 'skill2', 'skill3', 'skill4', 'skill5'];
+  const DRILL_SLOTS = ['warmup', ...SKILL_SLOTS, 'game'];
   const byId = Object.fromEntries(DRILLS.map(d => [d.id, d]));
   const KEY_SESSION = 'ebt.session.v1';
   const KEY_HISTORY = 'ebt.history.v1';
@@ -34,16 +37,17 @@
   };
 
   /* ---------- generator ---------- */
-  // Skill 1 is today's focus. Skill 2 is shooting or layups, because every
-  // session needs some (on a scoring day it's another skill instead).
-  // Skill 3 is a third, different skill. `s` is the session so far.
+  // Skills 1 and 5 are today's focus (two different drills). Skills 2–4
+  // cover the other three skills, one each, so every session works on all
+  // four; Skill 2 is shooting or layups whenever that isn't the focus.
+  // `s` is the session so far.
   function themesFor(slot, s) {
-    const others = FOCUS_ORDER.filter(t => t !== s.focus);
+    if (slot === 'skill1' || slot === 'skill5') return [s.focus];
+    if (slot === 'skill2' && s.focus !== 'score') return ['score'];
     const themeOf = k => byId[s.slots[k]] && byId[s.slots[k]].theme;
-    if (slot === 'skill1') return [s.focus];
-    if (slot === 'skill2') return s.focus !== 'score' ? ['score'] : others.filter(t => t !== themeOf('skill3'));
-    if (slot === 'skill3') return others.filter(t => t !== 'score' && t !== themeOf('skill2'));
-    return [];
+    const taken = ['skill2', 'skill3', 'skill4'].filter(k => k !== slot).map(themeOf);
+    return FOCUS_ORDER.filter(t => t !== s.focus && !taken.includes(t)
+      && (slot === 'skill2' || s.focus === 'score' || t !== 'score'));
   }
 
   function poolFor(slot, s) {
@@ -52,9 +56,12 @@
     return DRILLS.filter(d => d.slot === 'skill' && themes.includes(d.theme));
   }
 
-  function pickFrom(pool, avoid) {
-    const fresh = pool.filter(d => !avoid.includes(d.id));
-    return rand(fresh.length ? fresh : pool);
+  // A random drill from `pool`: never one already in this session (`taken`),
+  // and not a recent one (`avoid`) if there's another choice.
+  function pickFrom(pool, avoid, taken = []) {
+    const open = pool.filter(d => !taken.includes(d.id));
+    const fresh = open.filter(d => !avoid.includes(d.id));
+    return rand(fresh.length ? fresh : open.length ? open : pool);
   }
 
   const nextFocus = focus => FOCUS_ORDER[(FOCUS_ORDER.indexOf(focus) + 1) % FOCUS_ORDER.length];
@@ -71,7 +78,7 @@
     const lastRun = hist.recent || [];
     const recent = lastRun.concat(prev ? Object.values(prev.slots) : []);
     const s = { v: 1, created: Date.now(), focus, slots: {}, seen: {} };
-    ['warmup', 'skill1', 'skill2', 'skill3'].forEach(k => { s.slots[k] = pickFrom(poolFor(k, s), recent).id; });
+    ['warmup', ...SKILL_SLOTS].forEach(k => { s.slots[k] = pickFrom(poolFor(k, s), recent, Object.values(s.slots)).id; });
     // A team game that works on today's focus, avoiding the one from the
     // last session that was run where there's another.
     const games = poolFor('game', s);
@@ -124,11 +131,11 @@
     const s = store.get(KEY_SESSION);
     if (!s || s.v !== 1 || !THEMES[s.focus] || !s.slots) return null;
     s.seen = s.seen || {};
-    // Fills any part that's missing (a drill that's been removed, or Skill 3
-    // in a session saved before it existed).
+    // Fills any part that's missing (a drill that's been removed, or a
+    // skill slot in a session saved by an older version with fewer).
     let fixed = false;
     DRILL_SLOTS.forEach(k => {
-      if (!byId[s.slots[k]]) { s.slots[k] = pickFrom(poolFor(k, s), Object.values(s.slots)).id; fixed = true; }
+      if (!byId[s.slots[k]]) { s.slots[k] = pickFrom(poolFor(k, s), [], Object.values(s.slots)).id; fixed = true; }
     });
     if (fixed) save(s);
     return s;
