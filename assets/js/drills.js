@@ -158,7 +158,7 @@ const DRILLS = [
     need: { balls: 'each', cones: 3 },
     steps: [
       'Make 3 teams. Each team lines up on the half-way line. Put a cone near the hoop end in front of each team.',
-      'The first player dribbles to the cone with her RIGHT hand, goes around it, and comes back with her LEFT hand.',
+      'The first player dribbles to the cone with their RIGHT hand, goes around it, and comes back with their LEFT hand.',
       'High-five the next player, who goes next.',
       'First team to have everyone finish wins. Race again with a new move: speed dribble, or a crossover at the cone.',
     ],
@@ -247,7 +247,7 @@ const DRILLS = [
     say: ['Step and push!', 'Show your target hands', 'Thumbs down at the finish'],
     anim: {
       dur: 4,
-      // pairs 3 big steps apart; each passer steps towards her partner
+      // pairs 3 big steps apart; each passer steps towards their partner
       p: [
         { k: [[0, 150, 200], [0.08, 150, 208], [0.2, 150, 200], [1, 150, 200]] },
         { k: [[0, 150, 290], [0.58, 150, 290], [0.66, 150, 282], [0.78, 150, 290], [1, 150, 290]] },
@@ -272,7 +272,7 @@ const DRILLS = [
       'Count the passes out loud as a team. Can you get to 20 with no drops?',
       'Then try: bounce passes only, or catch with a jump stop before you pass.',
     ],
-    say: ['Call her name, then pass', 'Target hands up', 'Pass, then run!'],
+    say: ['Call their name, then pass', 'Target hands up', 'Pass, then run!'],
     anim: {
       dur: 7,
       p: [
@@ -295,10 +295,10 @@ const DRILLS = [
       'Groups of 3 with one ball: 2 passers stand 4 big steps apart, 1 defender (in a bib) stands in the middle.',
       'Passers can\'t dribble. Pivot and fake to get the ball past the defender.',
       'No passes higher than your head.',
-      'If the defender touches the ball, she swaps places with the passer who threw it.',
+      'If the defender touches the ball, they swap places with the passer who threw it.',
       'Swap the defender every minute anyway, so everyone gets a turn.',
     ],
-    say: ['Pivot, don\'t run', 'Fake one way, pass the other', 'Pass past her hip'],
+    say: ['Pivot, don\'t run', 'Fake one way, pass the other', 'Pass past their hip'],
     anim: {
       dur: 6,
       // passers 4 big steps apart. Each pivots and fakes one way, then
@@ -309,7 +309,7 @@ const DRILLS = [
         { face: [[0, -90], [0.55, -90], [0.6, -140], [0.67, -40], [0.75, -62], [0.9, -90]], k: [[0, 310, 260], [0.6, 310, 260], [0.65, 314, 250], [0.7, 310, 246], [0.78, 310, 260], [1, 310, 260]] },
       ],
       balls: [[[0, 0, 'h'], [0.27, 0], [0.34, [250, 290]], [0.42, 2, 'h'], [0.75, 2], [0.82, [250, 226]], [0.9, 0, 'h'], [1, 0, 'h']]],
-      cap: [[0, 0.27, 'Pivot and fake'], [0.27, 0.45, 'Pass past her hip'], [0.45, 1, 'Now the other side']],
+      cap: [[0, 0.27, 'Pivot and fake'], [0.27, 0.45, 'Pass past their hip'], [0.45, 1, 'Now the other side']],
       key: { a: 'Passers', d: 'In the middle' },
     },
   },
@@ -318,10 +318,10 @@ const DRILLS = [
     need: { balls: 'some' },
     steps: [
       'Pairs with one ball, about 4 big steps apart.',
-      'Pass to your partner. She catches it with a jump stop: both feet land together.',
-      'Then "triple threat": ball on her hip, knees bent, eyes on the hoop, ready to pass, dribble or shoot.',
-      'She pivots away and back on one glued foot, then passes it back. Swap after 5 catches each.',
-      'Harder: as she catches, call "pass", "dribble" or "shoot" and she does it.',
+      'Pass to your partner. They catch it with a jump stop: both feet land together.',
+      'Then "triple threat": ball on the hip, knees bent, eyes on the hoop, ready to pass, dribble or shoot.',
+      'They pivot away and back on one glued foot, then pass it back. Swap after 5 catches each.',
+      'Harder: as they catch, call "pass", "dribble" or "shoot" and they do it.',
     ],
     say: ['Catch and STOP!', 'Ball on your hip, eyes up', 'Pivot, don\'t walk'],
     anim: {
@@ -336,7 +336,7 @@ const DRILLS = [
         [[0, 0], [0.08, 0], [0.2, 1, 'h'], [0.62, 1], [0.74, 0], [1, 0]],
         [[0, 2], [0.08, 2], [0.2, 3, 'h'], [0.62, 3], [0.74, 2], [1, 2]],
       ],
-      cap: [[0, 0.2, 'Pass. She catches with a jump stop'], [0.2, 0.32, 'Triple threat: ball on her hip, eyes up'], [0.32, 0.58, 'Pivot away and back'], [0.58, 1, 'Pass it back']],
+      cap: [[0, 0.2, 'Pass. Catch with a jump stop'], [0.2, 0.32, 'Triple threat: ball on the hip, eyes up'], [0.32, 0.58, 'Pivot away and back'], [0.58, 1, 'Pass it back']],
       key: { a: 'Partners' },
     },
   },
@@ -346,11 +346,11 @@ const DRILLS = [
     steps: [
       'Pairs, both with a ball. One is the leader.',
       'The leader dribbles anywhere in the half court: fast, slow, stop, turn, swap hands.',
-      'Her partner follows about 2 big steps behind and copies everything she does.',
+      'Their partner follows about 2 big steps behind and copies everything the leader does.',
       'Blow the whistle every 30 seconds to swap leaders.',
       'Harder: weak hand only, or the leader adds a crossover.',
     ],
-    say: ['Eyes up: watch her, not your ball', 'Copy her hand', 'Stay 2 big steps behind'],
+    say: ['Eyes up: watch the leader, not your ball', 'Copy their hand', 'Stay 2 big steps behind'],
     anim: {
       dur: 9,
       // leaders loop round, followers copy one step behind
@@ -446,8 +446,8 @@ const DRILLS = [
     need: { balls: 'some', cones: 2, bibs: true },
     steps: [
       'Split into 2 teams (one in bibs), one team on each side of the key. Each team gets 1 ball and 1 cone, about 2–3 big steps from the hoop.',
-      'The first player shoots from the cone, grabs her own rebound, and passes to the next teammate.',
-      'Then she runs to the back of her line.',
+      'The first player shoots from the cone, grabs their own rebound, and passes to the next teammate.',
+      'Then they run to the back of their line.',
       '1 point for every basket. Count out loud as a team! First team to 10 wins.',
       'Play 3 rounds. Move the cones back one step each round.',
     ],
@@ -480,7 +480,7 @@ const DRILLS = [
       'Dribble straight at the hoop. Jump stop just in front of it: both feet land together.',
       'Ball to your chin, then jump up off both feet and lay it in off the backboard.',
       'Get your rebound and dribble back to the line around the outside.',
-      'Harder: a teammate walks behind you waving her arms. Stay strong and finish!',
+      'Harder: a teammate walks behind you waving their arms. Stay strong and finish!',
     ],
     say: ['Stop strong on two feet', 'Chin, then UP!', 'Use the backboard'],
     anim: {
@@ -528,7 +528,7 @@ const DRILLS = [
     need: { balls: 'each' },
     steps: [
       'Everyone has a ball. Make 3 lines: right wing, left wing and the top of the key.',
-      'Go one at a time, in order: right, left, top. The next girl goes when the shot goes up.',
+      'Go one at a time, in order: right, left, top. The next player goes when the shot goes up.',
       'Right wing: right-side layup (right, left, UP). Left wing: left-side layup (left, right, UP). Top: dribble in, jump stop, then UP.',
       'Grab your rebound and go round the outside to the next line: right → left → top → right.',
       'Count the team\'s baskets in 2 minutes. Beat it next round!',
@@ -565,10 +565,10 @@ const DRILLS = [
     need: {},
     steps: [
       'Pairs, facing each other, about 2 big steps apart. No ball yet.',
-      'One player is the leader and shuffles side to side. The other copies her, like a mirror.',
+      'One player is the leader and shuffles side to side. The other copies them, like a mirror.',
       'The defender stays low: feet wide, knees bent, hands up and out. Slide your feet. Don\'t cross them.',
       'Go for 20 seconds, then swap.',
-      'Then give the leader a ball to dribble while the defender mirrors her.',
+      'Then give the leader a ball to dribble while the defender mirrors them.',
     ],
     say: ['Low and wide, like sitting on a chair', 'Slide, don\'t cross', 'Busy hands!'],
     anim: {
@@ -591,7 +591,7 @@ const DRILLS = [
       'Start at the first cone in your defence stance: feet wide, knees bent, hands out.',
       'Slide to the next cone without crossing your feet. Turn, then slide to the next one.',
       'Jog back down the side and go again. Start the next player when the one in front reaches the second cone.',
-      'Harder: add a partner who dribbles the zig-zag slowly while you guard her.',
+      'Harder: add a partner who dribbles the zig-zag slowly while you guard them.',
     ],
     say: ['Push off your back foot', 'Stay low, don\'t bounce up', 'Never cross your feet'],
     anim: {
@@ -611,8 +611,8 @@ const DRILLS = [
     steps: [
       'Split into 2 teams (one in bibs). Number the players in each team 1, 2, 3, 4.',
       'Each defender guards the attacker with the SAME number.',
-      'Attackers walk around the half court (no ball yet). Defenders stay between their player and the hoop, pointing at her.',
-      'Shout "Freeze!" Everyone stops. Check: is every defender between her player and the basket?',
+      'Attackers walk around the half court (no ball yet). Defenders stay between their player and the hoop, pointing at them.',
+      'Shout "Freeze!" Everyone stops. Check: is every defender between their player and the basket?',
       'Then add a ball: attackers pass (no dribbling) and defenders stay with their number.',
     ],
     say: ['Ball, you, hoop: stay in between!', 'Point at your player', 'Talk: "I\'ve got 2!"'],
@@ -628,7 +628,7 @@ const DRILLS = [
         { team: 'd', n: 3, guard: 2, lag: 0.03 },
         { team: 'd', n: 4, guard: 3, lag: 0.03 },
       ],
-      cap: [[0, 0.82, 'Red 1 guards blue 1, red 2 guards blue 2...'], [0.82, 1, 'FREEZE! Is everyone between her player and the hoop?']],
+      cap: [[0, 0.82, 'Red 1 guards blue 1, red 2 guards blue 2...'], [0.82, 1, 'FREEZE! Is everyone between their player and the hoop?']],
       key: { a: 'Attackers' },
     },
   },
@@ -637,7 +637,7 @@ const DRILLS = [
     need: { balls: 'some' },
     steps: [
       'Defenders line up on the baseline next to the hoop. The first one has a ball. One attacker stands on the wing.',
-      'The defender passes to the attacker, then sprints out towards her.',
+      'The defender passes to the attacker, then sprints out towards them.',
       'Halfway there, switch to short, quick "chop chop" steps with one hand up high.',
       'Stop in your stance, an arm\'s length away. The attacker counts "1, 2, 3" then tries to dribble past. Stay in front!',
       'The defender becomes the next attacker. The attacker goes to the back of the defender line.',
@@ -652,7 +652,7 @@ const DRILLS = [
         { k: [[0, 85, 230], [0.58, 85, 230], [0.82, 160, 290], [1, 160, 290]] },
       ],
       balls: [[[0, 0], [0.08, 0], [0.2, 3], [1, 3]]],
-      cap: [[0, 0.12, 'Pass out to the wing'], [0.12, 0.3, 'Sprint!'], [0.3, 0.45, 'Chop, chop, chop. High hand!'], [0.45, 0.58, 'Stance: an arm\'s length away'], [0.58, 1, 'She dribbles. Stay in front!']],
+      cap: [[0, 0.12, 'Pass out to the wing'], [0.12, 0.3, 'Sprint!'], [0.3, 0.45, 'Chop, chop, chop. High hand!'], [0.45, 0.58, 'Stance: an arm\'s length away'], [0.58, 1, 'They dribble. Stay in front!']],
       key: { a: 'Attacker' },
     },
   },
@@ -660,13 +660,13 @@ const DRILLS = [
     id: 'box-out', name: 'Box Out Battle', slot: 'skill', theme: 'defence',
     need: { balls: 'some', bibs: true },
     steps: [
-      'Two pairs at a time, one on each side of the key: an attacker, and a defender (in a bib) between her and the hoop. The other pairs wait at the 3-point line.',
+      'Two pairs at a time, one on each side of the key: an attacker, and a defender (in a bib) between them and the hoop. The other pairs wait at the 3-point line.',
       'You (the coach) shoot from the top.',
-      'When the shot goes up, the defender turns, puts her back against the attacker, bends her knees and spreads her arms wide. The attacker tries to get around her to the ball.',
-      'Hold her out until the ball bounces, then grab it with 2 hands. No pushing with your hands!',
+      'When the shot goes up, the defender turns, puts their back against the attacker, bends their knees and spreads their arms wide. The attacker tries to get around them to the ball.',
+      'Hold them out until the ball bounces, then grab it with 2 hands. No pushing with your hands!',
       'After each shot the next 2 pairs come on. Swap jobs with your partner each turn.',
     ],
-    say: ['Find her, turn, sit!', 'Arms out wide like wings', 'Grab it with two hands'],
+    say: ['Find them, turn, sit!', 'Arms out wide like wings', 'Grab it with two hands'],
     anim: {
       dur: 6,
       p: [
@@ -677,7 +677,7 @@ const DRILLS = [
         { team: 'd', k: [[0, 333, 164], [0.2, 333, 164], [0.35, 322, 152], [0.5, 310, 158], [1, 310, 158]] },
       ],
       balls: [[[0, 0], [0.15, 0], [0.3, 'hoop'], [0.35, 'hoop'], [0.45, [240, 118]], [0.56, [240, 118]], [0.64, 2], [1, 2]]],
-      cap: [[0, 0.2, 'Coach shoots'], [0.2, 0.52, 'Find her, turn, sit: BOX OUT!'], [0.52, 1, 'Ball bounces. Grab it with 2 hands']],
+      cap: [[0, 0.2, 'Coach shoots'], [0.2, 0.52, 'Find them, turn, sit: BOX OUT!'], [0.52, 1, 'Ball bounces. Grab it with 2 hands']],
       key: { a: 'Attackers', d: 'Defenders (bibs)' },
     },
   },
@@ -686,9 +686,9 @@ const DRILLS = [
     need: { balls: 'some', cones: 10 },
     steps: [
       'Make a "gate" for each pair: 2 cones, 2 big steps apart. Spread the gates out.',
-      'The defender stands in front of her gate. The attacker starts 4 big steps away with a ball.',
-      'The attacker dribbles and tries to get through the gate. The defender slides to stay in front of her, without reaching in.',
-      'Through the gate = 1 point. Defender stops her for 5 seconds or gets the ball = 1 point. Swap jobs.',
+      'The defender stands in front of their gate. The attacker starts 4 big steps away with a ball.',
+      'The attacker dribbles and tries to get through the gate. The defender slides to stay in front, without reaching in.',
+      'Through the gate = 1 point. Defender stops them for 5 seconds or gets the ball = 1 point. Swap jobs.',
     ],
     say: ['Stay in front: slide, slide!', 'Low and wide', 'No reaching: move your feet'],
     anim: {
@@ -700,7 +700,7 @@ const DRILLS = [
         { b: 1, face: 0, hands: [[0, 'L'], [0.34, 'R'], [0.56, 'L']], k: [[0, 363, 300], [0.15, 363, 262], [0.4, 408, 250], [0.62, 318, 250], [0.82, 363, 262], [1, 363, 300]] },
         { team: 'd', k: [[0, 363, 200], [0.2, 363, 200], [0.44, 402, 200], [0.66, 324, 200], [0.86, 363, 200], [1, 363, 200]] },
       ],
-      cap: [[0, 0.15, 'Attacker dribbles at the gate'], [0.15, 0.66, 'Defender slides to stay in front'], [0.66, 1, 'Stopped her! Defender\'s point']],
+      cap: [[0, 0.15, 'Attacker dribbles at the gate'], [0.15, 0.66, 'Defender slides to stay in front'], [0.66, 1, 'Stopped! Defender\'s point']],
       key: { a: 'Attackers', d: 'Defenders' },
     },
   },
@@ -711,22 +711,22 @@ const DRILLS = [
       '4 attackers stand on spots around the 3-point line, one with the ball. 4 defenders (in bibs), one each.',
       'Attackers pass the ball round slowly. No dribbling, no running.',
       'Your player has the ball? Get close: an arm\'s length away, hands up.',
-      'She doesn\'t? Take 2 big steps towards the hoop and point at her. Move every time the ball moves!',
+      'They don\'t? Take 2 big steps towards the hoop and point at them. Move every time the ball moves!',
       'Shout "Freeze!" to check everyone\'s spot. Swap after 2 minutes. Then let the attackers cut.',
     ],
-    say: ['Ball moves, you move!', 'Her ball? Get close', 'No ball? Step to the hoop and point'],
+    say: ['Ball moves, you move!', 'Your player has it? Get close', 'No ball? Step to the hoop and point'],
     anim: {
       dur: 12,
       p: [
         { k: LW }, { k: [180, 330] }, { k: [320, 330] }, { k: RW },
-        // close while her player has the ball, 2 big steps towards the hoop while she doesn't
+        // close while their player has the ball, 2 big steps towards the hoop while they don't
         { team: 'd', k: [[0, 143, 168], [0.04, 143, 168], [0.1, 107, 207], [0.2, 107, 207], [0.26, 143, 168], [1, 143, 168]] },
         { team: 'd', k: [[0, 188, 299], [0.04, 188, 299], [0.1, 201, 248], [0.2, 201, 248], [0.26, 188, 299], [0.36, 188, 299], [0.42, 201, 248], [0.84, 201, 248], [0.9, 188, 299], [1, 188, 299]] },
         { team: 'd', k: [[0, 299, 248], [0.36, 299, 248], [0.42, 312, 299], [0.52, 312, 299], [0.58, 299, 248], [0.68, 299, 248], [0.74, 312, 299], [0.84, 312, 299], [0.9, 299, 248], [1, 299, 248]] },
         { team: 'd', k: [[0, 357, 168], [0.52, 357, 168], [0.58, 393, 207], [0.68, 393, 207], [0.74, 357, 168], [1, 357, 168]] },
       ],
       balls: [[[0, 1], [0.04, 1], [0.1, 0], [0.2, 0], [0.26, 1], [0.36, 1], [0.42, 2], [0.52, 2], [0.58, 3], [0.68, 3], [0.74, 2], [0.84, 2], [0.9, 1], [1, 1]]],
-      cap: [[0, 0.36, 'Her ball? Get close, hands up'], [0.36, 1, 'Ball moved? Step to the hoop and point at her']],
+      cap: [[0, 0.36, 'Your player has it? Get close, hands up'], [0.36, 1, 'Ball moved? Step to the hoop and point at them']],
       key: { a: 'Attackers', d: 'Defenders (bibs)' },
     },
   },
@@ -762,9 +762,9 @@ const DRILLS = [
     steps: [
       'Make 2 lines: one at the top of the key (with the balls) and one on the right wing.',
       'The first player at the top passes to the wing.',
-      'Then she cuts (runs fast) straight to the hoop with her hand up.',
+      'Then they cut (run fast) straight to the hoop with their hand up.',
       'The wing passes it back. The cutter catches it and does a layup.',
-      'The passer goes to the back of the top line. The cutter grabs her rebound and goes to the wing line. After a few minutes, use the left wing.',
+      'The passer goes to the back of the top line. The cutter grabs their rebound and goes to the wing line. After a few minutes, use the left wing.',
     ],
     say: ['Pass and GO!', 'Hand up: show where you want it', 'Cut hard, not a jog'],
     anim: {
@@ -788,11 +788,11 @@ const DRILLS = [
     steps: [
       '2 attackers start at half way with a ball, spread wide. 1 defender (in a bib) waits at the free-throw line.',
       'The player with the ball dribbles straight at the hoop.',
-      'If the defender comes to stop her, PASS to the open teammate. If the defender doesn\'t, keep going and lay it up.',
+      'If the defender comes to stop them, PASS to the open teammate. If the defender doesn\'t, keep going and lay it up.',
       'Play until there\'s a basket or the defender gets the ball. Then rotate: an attacker becomes the defender.',
       'When they\'ve got it, play 3 v 2.',
     ],
-    say: ['Make her stop you, then pass', 'Stay wide, don\'t come to the ball', 'Go hard to the hoop'],
+    say: ['Make them stop you, then pass', 'Stay wide, don\'t come to the ball', 'Go hard to the hoop'],
     anim: {
       dur: 6,
       p: [
@@ -801,7 +801,7 @@ const DRILLS = [
         { team: 'd', k: [[0, 250, 200], [0.3, 236, 214], [0.4, 222, 205], [0.55, 252, 188], [0.7, 270, 140], [1, 270, 140]] },
       ],
       balls: [[[0, 0], [0.42, 0], [0.55, 1], [0.65, 1], [0.72, 'hoop'], [0.76, 'hoop'], [0.82, [250, 88]], [1, [250, 88]]]],
-      cap: [[0, 0.4, 'Dribble straight at the hoop'], [0.4, 0.55, 'Defender stops her? PASS!'], [0.55, 1, 'Open player scores']],
+      cap: [[0, 0.4, 'Dribble straight at the hoop'], [0.4, 0.55, 'Defender stops you? PASS!'], [0.55, 1, 'Open player scores']],
       key: { a: 'Attackers' },
     },
   },
@@ -815,7 +815,7 @@ const DRILLS = [
       'Without the ball, move into empty space and call for it. The defence tries to intercept.',
       'If you\'re standing next to a teammate, one of you must move away.',
     ],
-    say: ['Move to empty space!', 'Pass and move', 'Call her name'],
+    say: ['Move to empty space!', 'Pass and move', 'Call their name'],
     anim: {
       dur: 7,
       // passes go round the outside, away from the hoop side where the defenders stand
@@ -837,7 +837,7 @@ const DRILLS = [
     need: { balls: 'some', bibs: true },
     steps: [
       'One player takes the ball out over the sideline. 2 teammates are on the court, with 2 defenders (in bibs).',
-      'The thrower has 5 seconds. Everyone counts out loud. She can\'t step on the line.',
+      'The thrower has 5 seconds. Everyone counts out loud. They can\'t step on the line.',
       'Teammates: run away from the ball first, then come back to it fast (a "V" cut). Hand up!',
       'Catch with 2 hands, turn and face the hoop.',
       'Swap the thrower and defenders every 3 throw-ins. Practise from the baseline too.',
@@ -864,8 +864,8 @@ const DRILLS = [
     steps: [
       'Pairs with one ball: a passer at the top and a cutter on the wing. Use both sides.',
       'The cutter walks 2 big steps towards the hoop. That\'s the fake.',
-      'Then she pushes off and runs straight back out to the wing with her hand up: a "V".',
-      'Pass to her hand. She catches, jump stops and turns to face the hoop.',
+      'Then they push off and run straight back out to the wing with their hand up: a "V".',
+      'Pass to their hand. They catch, jump stop and turn to face the hoop.',
       'Pass back and go again. Swap jobs after 5 goes.',
     ],
     say: ['Fake in, then come back hard', 'Hand up: show your target', 'Catch and face the hoop'],
@@ -896,7 +896,7 @@ const DRILLS = [
       'Everyone else moves up a spot to fill the gap, so all the spots are full again.',
       'Keep going: pass, cut, fill. After 4 passes, give the cutter the ball for a layup.',
     ],
-    say: ['Pass and cut!', 'Fill the empty spot', 'Spread out: one girl per spot'],
+    say: ['Pass and cut!', 'Fill the empty spot', 'Spread out: one player per spot'],
     anim: {
       dur: 9,
       p: [
@@ -921,7 +921,7 @@ const DRILLS = [
       'When the defence gets the ball, they take it out past the 3-point line before they attack.',
       'Basket = 2 points. Keep score out loud so everyone knows.',
     ],
-    say: ['Count the passes out loud!', 'Spread out, give her space', 'Hands up on defence'],
+    say: ['Count the passes out loud!', 'Spread out, give them space', 'Hands up on defence'],
     anim: {
       dur: 8,
       p: [
@@ -947,7 +947,7 @@ const DRILLS = [
       '2 teams with bibs: 4 v 4 on the half court. Swap extra players in every 2 minutes. Spare balls go in the bag so nobody trips.',
       'Play normal basketball.',
       'Every 30–60 seconds, blow your whistle and shout "FREEZE!" Everyone stops like a statue.',
-      'Check: are 2 attackers close enough to touch? Then the other team gets the ball. Is every defender between her player and the hoop? Defence gets a point.',
+      'Check: are 2 attackers close enough to touch? Then the other team gets the ball. Is every defender between their player and the hoop? Defence gets a point.',
       'Fix it ("Move away from your teammate"), then play on.',
     ],
     say: ['FREEZE!', 'Could you touch a teammate? Move!', 'Find your space'],
@@ -974,7 +974,7 @@ const DRILLS = [
     steps: [
       '2 teams with bibs: 4 v 4 on the half court. Give everyone a number, 1 to 4, in each team. Spare balls go in the bag so nobody trips.',
       'You can only guard the player with the SAME number as you.',
-      'Before each attack, defenders point at their player and shout her number.',
+      'Before each attack, defenders point at their player and shout their number.',
       'Play normal basketball. Defence gets a point for every steal or stop. Basket = 2 points.',
       'Swap extra players in every 2 minutes. They take the number of the player they replace.',
     ],
@@ -1005,7 +1005,7 @@ const DRILLS = [
       'Attack the hoop: dribble or cut to the basket for layups.',
       'Defence: stop the layup by staying between your player and the hoop. Hands up. Don\'t hit arms.',
     ],
-    say: ['Attack the hoop!', 'Right, left, UP!', 'Stay between her and the basket'],
+    say: ['Attack the hoop!', 'Right, left, UP!', 'Stay between them and the basket'],
     anim: {
       dur: 8,
       p: [
@@ -1117,12 +1117,12 @@ const DRILLS = [
     need: { balls: 'some', bibs: true },
     steps: [
       '2 teams on opposite sidelines, numbered 1 to 5 (bibs for one team). You stand at half way with the ball.',
-      'Call a number: both girls with that number run out. Pass the ball to one of them.',
-      'She attacks the hoop. The other defends: stay between her and the hoop!',
+      'Call a number: both players with that number run out. Pass the ball to one of them.',
+      'They attack the hoop. The other defends: stay between them and the hoop!',
       'Play until there\'s a basket or the defender gets the ball. Basket = 1 point. Then back to your sideline.',
       'Keep it quick. Once they\'ve got it, call 2 or 3 numbers at once for 2 v 2 or 3 v 3.',
     ],
-    say: ['Stay between her and the hoop', 'Low and wide, slide your feet', 'Attack the hoop!'],
+    say: ['Stay between them and the hoop', 'Low and wide, slide your feet', 'Attack the hoop!'],
     anim: {
       dur: 8,
       p: [
@@ -1136,7 +1136,7 @@ const DRILLS = [
           : { team: 'w', n: j + 1, k: [482, y] })),
       ],
       balls: [[[0, 0, 'h'], [0.22, 0], [0.3, 3], [0.52, 3], [0.58, 'hoop'], [0.62, 'hoop'], [0.68, [250, 90]], [1, [250, 90]]]],
-      cap: [[0, 0.12, '"Number 3!"'], [0.12, 0.3, 'Both 3s run out. You pass to one'], [0.3, 0.6, 'She attacks. The other defends'], [0.6, 1, 'Basket = 1 point. Back to your sideline']],
+      cap: [[0, 0.12, '"Number 3!"'], [0.12, 0.3, 'Both 3s run out. You pass to one'], [0.3, 0.6, 'They attack. The other defends'], [0.6, 1, 'Basket = 1 point. Back to your sideline']],
       key: { a: 'Team 1', w: 'Team 2 (bibs)' },
     },
   },
@@ -1148,7 +1148,7 @@ const HUDDLE = {
   id: 'huddle', name: 'Huddle and Cheer',
   steps: [
     'Everyone grabs a drink and sits in a circle.',
-    'Ask today\'s question (below). Let a few girls answer.',
+    'Ask today\'s question (below). Let a few players answer.',
     'Shout-out: "Who saw a teammate do something great today?"',
     'Give them the home challenge (below).',
     'Hands in the middle: "1, 2, 3... TEAM!"',
@@ -1157,12 +1157,12 @@ const HUDDLE = {
     sense:   { q: 'What should you do if you\'re standing right next to a teammate?', a: 'Move away and find empty space.', home: 'Watch 5 minutes of any basketball game. Spot the players spreading out.' },
     ball:    { q: 'What do your feet do when you stop dribbling?', a: 'Jump stop: both feet land together. Then pivot on one foot.', home: '50 dribbles with each hand, eyes up, while the TV is on.' },
     score:   { q: 'What are the layup steps on the right side?', a: 'Right, left, UP!', home: 'Practise "right, left, UP" steps in the hallway. No ball needed!' },
-    defence: { q: 'Where should a defender stand?', a: 'Between her player and the hoop.', home: 'Hold your defence stance for 30 seconds while you brush your teeth.' },
+    defence: { q: 'Where should a defender stand?', a: 'Between their player and the hoop.', home: 'Hold your defence stance for 30 seconds while you brush your teeth.' },
   },
   anim: {
     dur: 5,
     paths: false,
-    // each girl comes to the spot in the circle on her side, so nobody crosses
+    // each player comes to the spot in the circle on their side, so nobody crosses
     p: [[70, 120, 225], [430, 140, 315], [120, 400, 135], [380, 410, 45], [250, 120, 270], [60, 300, 180], [440, 300, 0], [250, 420, 90]].map(([x, y, deg]) => {
       const ang = deg * Math.PI / 180;
       const spot = [250 + Math.cos(ang) * 72, 270 + Math.sin(ang) * 72];

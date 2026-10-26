@@ -1,6 +1,6 @@
 # Easy Basketball Training 🏀
 
-**One tap makes a full 60-minute junior basketball training session.** Built for a brand-new coach running a brand-new Under 12 girls' team on a half court with one hoop.
+**One tap makes a full 60-minute junior basketball training session.** Built for a brand-new coach running a brand-new Under 12 team on a half court with one hoop.
 
 Live site: **https://databerryau.github.io/basketball-training/**
 
@@ -14,7 +14,7 @@ Live site: **https://databerryau.github.io/basketball-training/**
 | **Swap** | Don't like a drill? Swap it for another one that fits the same slot. There are 42 drills to mix in and out. |
 | **Start session** | At the court: one part per screen, a big countdown timer, beeps when time's up, and the screen stays on. If the phone reloads the page, it carries on where it was. |
 | **No internet needed** | After one visit it opens with no reception. Add it to the home screen and it opens like an app. |
-| **Game day** | Manages subs during games. Even split tells the coach who goes on and off every few minutes so every girl plays the same time; manual just counts everyone's minutes. The squad's first names stay on the phone. |
+| **Game day** | Manages subs during games. Even split tells the coach who goes on and off every few minutes so every player plays the same time; manual just counts everyone's minutes. The squad's first names stay on the phone. |
 | **Coach help** | New coach basics, simple rules, basketball words and game-day tips. |
 
 The full spec (from the interview) is in [SPEC.md](SPEC.md).

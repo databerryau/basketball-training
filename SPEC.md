@@ -1,6 +1,6 @@
 # Easy Basketball Training: spec
 
-A one-button training session generator for a **brand-new coach** of a **brand-new junior girls' team**. Everything has to be super basic and clear: if the coach has to think about how to use it, it's too complicated.
+A one-button training session generator for a **brand-new coach** of a **brand-new junior team**. Everything has to be super basic and clear: if the coach has to think about how to use it, it's too complicated.
 
 This spec comes from an interview with the team's parent helper (25 October 2026).
 
@@ -13,7 +13,7 @@ This spec comes from an interview with the team's parent helper (25 October 2026
 | **Coach** | Brand new to coaching. Uses the tool **on a phone, at the court**. |
 | **Players** | Girls, **Under 12 (about 10–11 years old)** |
 | **Squad size** | Usually **8–10 players** at training |
-| **Experience** | Mostly beginners: **one or two girls** have played before |
+| **Experience** | Mostly beginners: **one or two players** have played before |
 | **Session length** | **60 minutes** |
 | **Court** | **Half court, 1 hoop** |
 | **Equipment** | **A ball for every player**, cones/markers, two sets of bibs |
@@ -38,7 +38,7 @@ This spec comes from an interview with the team's parent helper (25 October 2026
 - **Run it at the court.** A *Start session* mode with one drill per screen, a big countdown timer and a beep when time's up.
 - **Fix the real problems.** Every session targets one of the four game problems above, and the focus rotates so all four get covered.
 - **Help a new coach grow.** A *Coach help* section with the basics, simple rules, basketball words and game-day tips.
-- **Game day.** A *Game day* tab that manages subs during games so every girl gets a fair go: an even split that says who goes on and off every few minutes, or a manual mode that just counts minutes. Full details in [GAMEDAY.md](GAMEDAY.md).
+- **Game day.** A *Game day* tab that manages subs during games so every player gets a fair go: an even split that says who goes on and off every few minutes, or a manual mode that just counts minutes. Full details in [GAMEDAY.md](GAMEDAY.md).
 
 **Non-goals (deliberately left out to keep it simple)**
 
@@ -54,7 +54,7 @@ This spec comes from an interview with the team's parent helper (25 October 2026
 
 ### 3.1 Same shape every time
 
-Every session has the same ten parts, so the girls learn the routine and the coach always knows what comes next. After the head coach's feedback (26 October 2026), the skill drills are short (7 minutes) so five fit in and the girls stay interested, the drinks are short and more often, and the team game is short too.
+Every session has the same ten parts, so the players learn the routine and the coach always knows what comes next. After the head coach's feedback (26 October 2026), the skill drills are short (7 minutes) so five fit in and the players stay interested, the drinks are short and more often, and the team game is short too.
 
 | # | Part | Minutes | What it is |
 |---|---|---|---|
@@ -84,7 +84,7 @@ Each session picks **one focus**, and each focus fixes one of the game problems:
 - The focus **rotates** in that order. The first session ever is *Spread out & get open*, the most common beginner problem.
 - The focus only moves on once a session has been **run** (the timer was started, or the coach got to the end). Making a new session before running the current one keeps the same focus and picks different drills, so no focus gets skipped.
 - Some coaches only read the plan and never use *Start session*. So a session made **2 or more days ago** also counts as run when it's replaced, or their focus would never move on.
-- **Picking a focus.** Under the focus card, a small *Work on something else this week?* link opens the other focuses. Tapping one makes a new plan on it straight away (no "Are you sure?"), for a week when the last game showed the girls need something else. The rotation then carries on from that focus. It's closed until asked for, so one tap still makes the whole plan.
+- **Picking a focus.** Under the focus card, a small *Work on something else this week?* link opens the other focuses. Tapping one makes a new plan on it straight away (no "Are you sure?"), for a week when the last game showed the team needs something else. The rotation then carries on from that focus. It's closed until asked for, so one tap still makes the whole plan.
 - The page remembers the last focus on that phone.
 
 ### 3.3 How a session is put together
@@ -127,13 +127,13 @@ Every drill card has:
    - red circles = defenders / taggers
    - green circles = the second team, or the team waiting to come on
    - a grey **C** = the coach
-   - an orange dot = the ball. A player holding it has it in front of her ("at her chin"), so it turns with her when she pivots, and a player who's just caught it turns to face whoever she passes to next. A player dribbling has it bouncing at her side, in the hand the drill says (it crosses over when she swaps hands). Passes loop slightly, bounce passes go via the floor, and shots arc.
+   - an orange dot = the ball. A player holding it has it in front of them ("at their chin"), so it turns with them when they pivot, and a player who's just caught it turns to face whoever they pass to next. A player dribbling has it bouncing at their side, in the hand the drill says (it crosses over when they swap hands). Passes loop slightly, bounce passes go via the floor, and shots arc.
    - orange triangles = cones
    - faint dashed lines = where players run
    - a caption bar under the court saying what's happening right now ("Red light! Jump stop")
    - a small key under the caption naming each colour in that drill ("Shooter", "Rebounder", "Taggers"...)
    - tap the diagram to pause or play. Animations loop. With *reduce motion* switched on, the diagram starts paused on a moment that shows the drill.
-   - the picture matches the words: distances in the steps are drawn to scale (1 big step ≈ 0.8 m), players join the right spot at the back of a line by going round it, defenders stay between their player and the hoop without standing on her, and passes go round defenders rather than through them.
+   - the picture matches the words: distances in the steps are drawn to scale (1 big step ≈ 0.8 m), players join the right spot at the back of a line by going round it, defenders stay between their player and the hoop without standing on them, and passes go round defenders rather than through them.
 3. **How it works**: 3–5 numbered steps in plain English.
 4. **What to say**: 2–3 short coaching cues to shout ("Eyes up!", "Right, left, UP!").
 5. **You need**: balls, cones, bibs.
@@ -188,7 +188,7 @@ A full-screen mode for running the session live.
 
 A second tab with four short sections. Each is a list of small cards, readable in under a minute.
 
-1. **New coach basics**: getting their attention, explaining a drill in 30 seconds, keeping lines short, praising out loud and correcting quietly, one fix at a time, safety and water, what to do if someone gets hurt, head knocks ("if in doubt, sit her out"), keeping kids safe (Working With Children Check, never alone with one child), hearing the beep, what to do when a drill isn't working, putting the app on the home screen.
+1. **New coach basics**: getting their attention, explaining a drill in 30 seconds, keeping lines short, praising out loud and correcting quietly, one fix at a time, safety and water, what to do if someone gets hurt, head knocks ("if in doubt, sit them out"), keeping kids safe (Working With Children Check, never alone with one child), hearing the beep, what to do when a drill isn't working, putting the app on the home screen.
 2. **Rules made simple**: travelling, double dribble, fouls, 3 seconds, out of bounds and throw-ins, backcourt, held balls, free throws, scoring. Plus a reminder that junior leagues often have their own rules.
 3. **Basketball words**: a small glossary (layup, jump stop, pivot, triple threat, box out, give-and-go, key, wing, baseline and more).
 4. **Game day**: before the game, fair minutes for everyone with simple sub patterns, what to say at time-outs, staying positive, the after-game huddle.
@@ -202,6 +202,7 @@ A second tab with four short sections. Each is a list of small cards, readable i
 - **Light theme only**, for readability under gym lights.
 - **Generic**: no team name, so the coach can share it with other new coaches.
 - Plain, encouraging language. No jargon without an explanation.
+- Says **player** (and they / them), never girl or she, so it suits any team. (The first team was Under 12 girls, but the app doesn't call that out.)
 
 ---
 

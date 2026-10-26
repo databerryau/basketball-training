@@ -2,7 +2,7 @@
    Easy Basketball Training: generator, plan view, run mode
    ========================================================= */
 (() => {
-  // Five short skill drills keep the girls interested, with a quick drink
+  // Five short skill drills keep the players interested, with a quick drink
   // after every two (the huddle starts with one too), then a short team game.
   const SLOTS = [
     { key: 'warmup', label: 'Warm-up game', min: 6, icon: '🔥' },
@@ -248,12 +248,12 @@
   }
 
   // The focus normally just rotates. This lets the coach pick another one
-  // for a week when the girls need it; it stays closed until asked for.
+  // for a week when the team needs it; it stays closed until asked for.
   function focusChoiceHTML(themes, label) {
     return `
       <button type="button" class="btn btn-link" data-action="choose-focus" aria-expanded="false" aria-controls="focusChoice">${esc(label)}</button>
       <div class="focus-choice" id="focusChoice" hidden>
-        <p class="small">Pick what the girls need most. You'll get a new plan.</p>
+        <p class="small">Pick what the team needs most. You'll get a new plan.</p>
         ${themes.map(t => `
           <button type="button" class="btn btn-choice" data-focus="${t}">
             <span class="choice-name"><span aria-hidden="true">${THEMES[t].icon}</span> ${esc(THEMES[t].name)}</span>

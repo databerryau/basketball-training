@@ -6,9 +6,9 @@
 
    Minutes run on the app's own game timer (pause it at breaks
    and time-outs), not the wall clock. Even split keeps a fair
-   share for every girl: while the timer runs, each girl who's
-   here earns 5 / (girls here) of the time, and at every sub
-   moment the girls furthest behind their share go on.
+   share for every player: while the timer runs, each player who's
+   here earns 5 / (players here) of the time, and at every sub
+   moment the players furthest behind their share go on.
    ========================================================= */
 const GameDay = (() => {
   const KEY_SQUAD = 'ebt.squad.v1';
@@ -19,7 +19,7 @@ const GameDay = (() => {
   const SUB_EVERY = 6;                                   // even split: how often to aim to sub (minutes), unless the coach changes it
   const EVERY_MIN = 2, EVERY_MAX = 12;
   const LENGTHS = [[2, 18], [2, 20], [4, 8], [4, 10]];   // quick picks: [periods, minutes each]; the first is the default
-  // Each girl keeps her own colour, so she's easy to spot in the lists.
+  // Each player keeps their own colour, so they're easy to spot in the lists.
   const COLOURS = ['#2563EB', '#DC2626', '#16A34A', '#9333EA', '#F59E0B', '#0891B2', '#DB2777', '#65A30D',
     '#4F46E5', '#EA580C', '#0D9488', '#A16207', '#334155', '#38BDF8', '#FACC15'];
 
@@ -39,7 +39,7 @@ const GameDay = (() => {
   let game = loadGame();       // in progress, or finished (its summary), or null
   let screen = 'auto';          // 'auto' | 'squad' | 'setup'
   let setup = null;             // { here: [ids], starters: [ids], other: bool } while setting up
-  let picked = null;            // the girl tapped first for a sub
+  let picked = null;            // the player tapped first for a sub
 
   // The lowest colour nobody else in the squad has.
   const freeColour = () => {
@@ -47,7 +47,7 @@ const GameDay = (() => {
     const i = COLOURS.findIndex((c, j) => !used.includes(j));
     return i < 0 ? squad.length % COLOURS.length : i;
   };
-  // A squad saved before colours existed: give each girl hers, and keep it.
+  // A squad saved before colours existed: give each player one, and keep it.
   if (squad.some(p => !Number.isInteger(p.colour))) {
     squad.forEach(p => { if (!Number.isInteger(p.colour)) p.colour = freeColour(); });
     store.set(KEY_SQUAD, squad);
@@ -62,7 +62,7 @@ const GameDay = (() => {
       && [2, 4].includes(g.periods) && g.periodSecs > 0 && g.period >= 1 && g.period <= g.periods
       && g.played && g.share && ['even', 'manual'].includes(g.mode);
     if (!ok) return null;
-    // whole seconds only, so every girl's time ticks over with the clock
+    // whole seconds only, so every player's time ticks over with the clock
     ['played', 'share'].forEach(k => Object.keys(g[k]).forEach(id => { g[k][id] = Math.round(g[k][id] || 0); }));
     g.lastCommit = Math.round(g.lastCommit || 0);
     return g;
@@ -82,7 +82,7 @@ const GameDay = (() => {
     return Math.min(game.periodSecs, Math.max(0, e));
   }
   const clockNow = () => (game.period - 1) * game.periodSecs + periodElapsed();
-  // The clock, the next-subs countdown and every girl's minutes all count in
+  // The clock, the next-subs countdown and every player's minutes all count in
   // whole seconds of the game clock, so they all tick over together.
   const clockSecs = () => Math.floor(clockNow() + 1e-6);
   const periodSecsDone = () => Math.floor(periodElapsed() + 1e-6);
@@ -101,8 +101,8 @@ const GameDay = (() => {
   const here = () => game.players.filter(p => !p.out);
   const player = id => game.players.find(p => p.id === id);
 
-  // Credits the time since the last change: minutes to the girls on court,
-  // and a fair share to every girl who's here. (Taken back off if the coach
+  // Credits the time since the last change: minutes to the players on court,
+  // and a fair share to every player who's here. (Taken back off if the coach
   // nudged the timer back, so minutes always go with the clock.)
   function commit() {
     const now = clockSecs();
@@ -117,8 +117,8 @@ const GameDay = (() => {
   const playedNow = id => (game.played[id] || 0) + (game.onCourt.includes(id) ? Math.max(0, clockSecs() - game.lastCommit) : 0);
   const owed = id => (game.played[id] || 0) - (game.share[id] || 0);   // below 0 = owed time
 
-  // Even split: the girls furthest behind their share go on (on a tie,
-  // girls on the bench before girls on court), the rest come off.
+  // Even split: the players furthest behind their share go on (on a tie,
+  // players on the bench before players on court), the rest come off.
   function plan() {
     commit();
     const ins = here().map(p => p.id);
@@ -131,7 +131,7 @@ const GameDay = (() => {
   }
 
   // A spot on court is empty (someone hurt or out, or a late arrival with
-  // fewer than 5 on): in even split, ask for the girl owed most time.
+  // fewer than 5 on): in even split, ask for the player owed most time.
   function fillGaps() {
     if (game.mode !== 'even' || game.finished) return;
     const spots = Math.min(COURT, here().length) - game.onCourt.length;
@@ -236,7 +236,7 @@ const GameDay = (() => {
     if (!d.off.length && !d.on.length) game.due = null;
   }
 
-  // A sub, in either mode: tap a girl on the bench and the girl she replaces
+  // A sub, in either mode: tap a player on the bench and the player coming off
   // (either order). The plan never goes exactly to plan, so even split just
   // carries on from whatever the coach did.
   function tapPlayer(id) {
@@ -258,7 +258,7 @@ const GameDay = (() => {
     tidyDue([off, on]);
   }
 
-  // After a sub the coach made, drop those girls from any "Subs due"
+  // After a sub the coach made, drop those players from any "Subs due"
   // suggestion, keeping the rest of it (as many off as on).
   function tidyDue(ids) {
     const d = game.due;
@@ -301,7 +301,7 @@ const GameDay = (() => {
     fillGaps();
   }
 
-  // Nudge the timer to match the scoreboard. The girls on court gain or lose
+  // Nudge the timer to match the scoreboard. The players on court gain or lose
   // the same time straight away, so their minutes keep ticking with the clock.
   function adjust(secs) {
     commit();
@@ -376,7 +376,7 @@ const GameDay = (() => {
 
   const intro = `
     <h1 class="gd-title">Game day</h1>
-    <p class="lead">Keeps track of subs and minutes during a game, so every girl gets a fair go.</p>`;
+    <p class="lead">Keeps track of subs and minutes during a game, so every player gets a fair go.</p>`;
 
   function squadHTML() {
     return `${intro}
@@ -397,7 +397,7 @@ const GameDay = (() => {
       </div>`;
   }
 
-  // Keeps the starting five sensible as girls are ticked in and out.
+  // Keeps the starting five sensible as players are ticked in and out.
   function tidyStarters() {
     setup.starters = setup.starters.filter(id => setup.here.includes(id));
     const want = Math.min(COURT, setup.here.length);
@@ -422,7 +422,7 @@ const GameDay = (() => {
     return `Subs every ${minutesText(prefs.mins / n)}: ${n - 1} in each ${each}, plus ${breaks}.`;
   }
 
-  // Whether the chosen interval splits the time evenly for the girls who are
+  // Whether the chosen interval splits the time evenly for the players who are
   // here (5 on court, so the turns must share out exactly), and if not, the
   // nearest interval that would.
   function evennessHTML() {
@@ -431,14 +431,14 @@ const GameDay = (() => {
     const turns = e => prefs.periods * stintsPer(prefs.mins, e) * COURT;
     if (turns(prefs.subEvery) % n === 0) {
       const each = Math.round(prefs.periods * prefs.mins * COURT / n * 10) / 10;
-      return `<p class="gd-even is-ok">✓ With ${n} girls, everyone gets the same time: ${each} minutes each.</p>`;
+      return `<p class="gd-even is-ok">✓ With ${n} players, everyone gets the same time: ${each} minutes each.</p>`;
     }
     const better = [];
     for (let e = EVERY_MIN; e <= EVERY_MAX; e++) if (turns(e) % n === 0) better.push(e);
     better.sort((a, b) => Math.abs(a - prefs.subEvery) - Math.abs(b - prefs.subEvery) || a - b);
     const extra = minutesText(prefs.mins / stintsPer(prefs.mins, prefs.subEvery));
     return `<div class="gd-even">
-      <p>With ${n} girls this doesn't share out exactly: some girls will get one more turn than others (${extra}).</p>
+      <p>With ${n} players this doesn't share out exactly: some players will get one more turn than others (${extra}).</p>
       ${better.length ? `<button type="button" class="btn btn-ghost" data-gd="every-set" data-e="${better[0]}">Sub every ${better[0]} min instead (even time)</button>` : ''}
     </div>`;
   }
@@ -509,7 +509,7 @@ const GameDay = (() => {
       <button type="button" class="btn btn-big btn-primary" data-gd="new-game">New game</button>`;
   }
 
-  // Each girl's row is her colour, so she's easy to spot. Tap it to sub her.
+  // Each player's row is their colour, so they're easy to spot. Tap it to sub them.
   function rowHTML(p, where) {
     const style = `--pc:${colourOf(p)}`;
     const mins = `<span class="gd-mins" data-min="${esc(p.id)}">${fmt(playedNow(p.id))}</span>`;
@@ -555,10 +555,10 @@ const GameDay = (() => {
     const empty = Math.min(COURT, here().length) - court.length;
     const squadLeft = squad.filter(p => !game.players.some(x => x.id === p.id));   // anyone hurt or resting is listed already
     const p1 = picked && player(picked);
-    const hint = p1 ? `${game.onCourt.includes(picked) ? 'Now tap the girl coming on' : 'Now tap the girl she replaces'} (or ${esc(p1.name)} again to cancel).`
-      : empty > 0 ? 'Tap a girl on the bench to fill the empty spot.'
-      : game.mode === 'even' ? 'Sub any time: tap a girl on the bench, then the girl she replaces.'
-      : 'To sub, tap a girl on the bench, then the girl she replaces.';
+    const hint = p1 ? `${game.onCourt.includes(picked) ? 'Now tap who\'s coming on' : 'Now tap who\'s coming off'} (or ${esc(p1.name)} again to cancel).`
+      : empty > 0 ? 'Tap a player on the bench to fill the empty spot.'
+      : game.mode === 'even' ? 'Sub any time: tap a player on the bench, then the player coming off.'
+      : 'To sub, tap a player on the bench, then the player coming off.';
     return `
       <div class="card gd-clock-card">
         <p class="eyebrow">${periodName(game, game.period)} of ${game.periods}${game.atBreak ? ' · finished' : ''}</p>
@@ -581,15 +581,15 @@ const GameDay = (() => {
           <button type="button" data-gd="mode" data-mode="even" aria-pressed="${game.mode === 'even'}">Even split</button>
           <button type="button" data-gd="mode" data-mode="manual" aria-pressed="${game.mode === 'manual'}">Manual</button>
         </div>
-        <button type="button" class="btn btn-ghost" data-gd="add-toggle" aria-expanded="${adding}">＋ A girl arrived late</button>
+        <button type="button" class="btn btn-ghost" data-gd="add-toggle" aria-expanded="${adding}">＋ A player arrived late</button>
         ${adding ? `<div class="gd-arrivals">
           ${squadLeft.length ? `<div class="gd-chips">${squadLeft.map(p => `<button type="button" class="gd-chip" data-gd="arrive" data-id="${esc(p.id)}">${esc(p.name)}</button>`).join('')}</div>` : ''}
           <form class="gd-add" data-gd-form="arrive">
-            <label class="gd-field">New girl<input id="gdName" name="first" maxlength="20" autocomplete="off" required></label>
+            <label class="gd-field">New player<input id="gdName" name="first" maxlength="20" autocomplete="off" required></label>
             <label class="gd-field gd-field-num">Number<input id="gdNum" name="num" inputmode="numeric" maxlength="2" autocomplete="off"></label>
             <button type="submit" class="btn btn-ghost">Add</button>
           </form></div>` : ''}
-        <button type="button" class="btn btn-ghost" data-gd="rest-toggle" aria-expanded="${resting}">A girl is hurt or resting</button>
+        <button type="button" class="btn btn-ghost" data-gd="rest-toggle" aria-expanded="${resting}">A player is hurt or resting</button>
         ${resting ? `<div class="gd-chips">${here().map(p => `<button type="button" class="gd-chip" data-gd="rest" data-id="${esc(p.id)}">${dot(p)}${nameHTML(p)}</button>`).join('')}</div>` : ''}
         <button type="button" class="btn btn-link" data-gd="end">End the game</button>
       </div>`;
