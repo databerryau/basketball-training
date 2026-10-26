@@ -746,14 +746,16 @@
   });
 
   /* ---------- tabs ---------- */
+  const TABS = ['session', 'gameday', 'help'];
+  // gameday.js may be missing for a moment after an update (see index.html).
+  const gameDay = typeof GameDay !== 'undefined' ? GameDay : null;
+
   function showTab(name) {
-    const help = name === 'help';
-    $('#view-session').hidden = help;
-    $('#view-help').hidden = !help;
+    if (!TABS.includes(name)) name = 'session';
+    TABS.forEach(t => { $(`#view-${t}`).hidden = t !== name; });
     document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === name));
-    if (location.hash !== (help ? '#help' : '#session') && (help || location.hash)) {
-      history.replaceState(null, '', help ? '#help' : '#session');
-    }
+    if (location.hash !== `#${name}` && (name !== 'session' || location.hash)) history.replaceState(null, '', `#${name}`);
+    if (name === 'gameday' && gameDay) gameDay.show();
   }
 
   /* ---------- events ---------- */
@@ -845,7 +847,8 @@
   run = loadRun();
   renderPlan();
   renderHelp();
-  showTab(location.hash === '#help' ? 'help' : 'session');
+  if (gameDay) gameDay.init($('#gameday'));
+  showTab(location.hash.slice(1));
   if (run && run.open) showRun();
 
   // Keeps a copy of the app on the phone (see sw.js). Off on this computer's

@@ -30,6 +30,7 @@
       </div>
       <nav class="tabs" role="tablist" aria-label="Pages">
         <button type="button" role="tab" data-tab="session" aria-selected="true" aria-controls="view-session">Session</button>
+        <button type="button" role="tab" data-tab="gameday" aria-selected="false" aria-controls="view-gameday">Game day</button>
         <button type="button" role="tab" data-tab="help" aria-selected="false" aria-controls="view-help">Coach help</button>
       </nav>
     </div>
@@ -38,6 +39,10 @@
   <main>
     <section id="view-session" role="tabpanel" aria-label="Session">
       <div id="session"></div>
+    </section>
+    <section id="view-gameday" role="tabpanel" aria-label="Game day" hidden>
+      <!-- replaced by gameday.js; only seen if that file hasn't arrived yet -->
+      <div id="gameday"><p class="lead">Open the app once more with internet to finish updating.</p></div>
     </section>
     <section id="view-help" role="tabpanel" aria-label="Coach help" hidden>
       <div id="help"></div>
@@ -51,6 +56,7 @@
   <script src="assets/js/court.js"></script>
   <script src="assets/js/drills.js"></script>
   <script src="assets/js/help.js"></script>
+  <script src="assets/js/gameday.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>

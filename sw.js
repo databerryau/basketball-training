@@ -12,7 +12,7 @@
    If you add, rename or remove a file, update APP_FILES and
    change VERSION.
    ========================================================= */
-const VERSION = 'basketball-training-v1';
+const VERSION = 'basketball-training-v2';
 const PREFIX = 'basketball-training-';   // other sites share this origin: only touch our own caches
 
 const APP_FILES = [
@@ -23,6 +23,7 @@ const APP_FILES = [
   'assets/js/court.js',
   'assets/js/drills.js',
   'assets/js/help.js',
+  'assets/js/gameday.js',
   'assets/js/app.js',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',

@@ -14,6 +14,7 @@ Live site: **https://databerryau.github.io/basketball-training/**
 | **Swap** | Don't like a drill? Swap it for another one that fits the same slot. There are 42 drills to mix in and out. |
 | **Start session** | At the court: one part per screen, a big countdown timer, beeps when time's up, and the screen stays on. If the phone reloads the page, it carries on where it was. |
 | **No internet needed** | After one visit it opens with no reception. Add it to the home screen and it opens like an app. |
+| **Game day** | Manages subs during games. Even split tells the coach who goes on and off every few minutes so every girl plays the same time; manual just counts everyone's minutes. The squad's first names stay on the phone. |
 | **Coach help** | New coach basics, simple rules, basketball words and game-day tips. |
 
 The full spec (from the interview) is in [SPEC.md](SPEC.md).
@@ -34,12 +35,14 @@ The offline copy (`sw.js`) is switched off on `localhost`, so it can't get in th
 ```
 index.html             page structure
 SPEC.md                the spec
+GAMEDAY.md             the Game day spec
 sw.js                  offline copy (service worker)
 manifest.webmanifest   home screen name, colours and icons
 assets/css/style.css   bright, friendly theme
 assets/js/court.js     half-court drawing and animation engine
 assets/js/drills.js    every drill: steps, cues, equipment, animation
 assets/js/help.js      Coach help content
+assets/js/gameday.js   Game day: squad, sub timer, even split and manual subs
 assets/js/app.js       generator, session view, Start session mode
 assets/icons/          home screen icons
 ```

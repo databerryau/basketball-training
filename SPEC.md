@@ -38,11 +38,12 @@ This spec comes from an interview with the team's parent helper (25 October 2026
 - **Run it at the court.** A *Start session* mode with one drill per screen, a big countdown timer and a beep when time's up.
 - **Fix the real problems.** Every session targets one of the four game problems above, and the focus rotates so all four get covered.
 - **Help a new coach grow.** A *Coach help* section with the basics, simple rules, basketball words and game-day tips.
+- **Game day.** A *Game day* tab that manages subs during games so every girl gets a fair go: an even split that says who goes on and off every few minutes, or a manual mode that just counts minutes. Full details in [GAMEDAY.md](GAMEDAY.md).
 
 **Non-goals (deliberately left out to keep it simple)**
 
 - No settings for age, squad size, session length or court. The tool is built for this team's setup.
-- No accounts, logins, player names or personal data.
+- No accounts or logins. The only personal data is the *Game day* squad: first names (and optional jersey numbers), kept on that phone and never sent anywhere.
 - No sharing links, printing or saved favourites. (They can be added later if wanted.)
 - No Spanish or other languages. **English only, Australian spelling.**
 - No drill editor.
@@ -221,12 +222,14 @@ A second tab with four short sections. Each is a list of small cards, readable i
   assets/js/court.js     half-court drawing and animation engine
   assets/js/drills.js    every drill: steps, cues, equipment, animation
   assets/js/help.js      Coach help content
+  assets/js/gameday.js   Game day: squad, sub timer, even split and manual subs
+  GAMEDAY.md             the Game day spec
   assets/js/app.js       generator, session view, Start session mode
   assets/icons/          home screen icons
   ```
 
 - **Animations** are data, not video. Each drill lists players, cones and the ball with keyframes (`[time, x, y]` on a 500 × 467 half court), and `court.js` draws and animates them with SVG. Defenders can be told to "guard" an attacker, which keeps them between that player and the hoop automatically.
-- **Storage**: the current session, the last focus (and recent drills) of the last session that was run, and the state of a running session are kept in `localStorage`, wrapped so the page still works without it.
+- **Storage**: the current session, the last focus (and recent drills) of the last session that was run, the state of a running session, and the Game day squad, settings and game in progress are kept in `localStorage`, wrapped so the page still works without it.
 - **Hosting: GitHub Pages**, from the `main` branch of its own repo (`databerryau/basketball-training`):
   **https://databerryau.github.io/basketball-training/**
   It started as a folder inside `databerryau/Spain-football-dashboard` and was moved here with its history.
@@ -249,6 +252,7 @@ A second tab with four short sections. Each is a list of small cards, readable i
 - [ ] Published on GitHub Pages.
 
 ## 10. Ideas for later
+
 
 - Share a session link with an assistant coach.
 - Printable one-page plan.
