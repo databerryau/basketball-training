@@ -344,17 +344,17 @@ main { max-width: 680px; margin: 0 auto; padding: 16px 16px 48px; }
 .gd-list-title { font-size: 20px; font-weight: 900; margin: 18px 4px 8px; }
 .gd-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .gd-row { display: flex; gap: 6px; }
-/* each girl's row: her colour down the side, and a faint bar of it that fills with her minutes */
+/* each girl's row is her colour: a stripe down the side and a light wash of it behind */
 .gd-who {
   position: relative; overflow: hidden;
   flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px;
   min-height: 58px; padding: 8px 10px 8px 14px; border: 2px solid transparent; border-left: 12px solid var(--pc, var(--line));
   border-radius: 14px; background: var(--card); box-shadow: var(--shadow); cursor: pointer; text-align: left;
 }
-.gd-bar { position: absolute; inset: 0 auto 0 0; background: var(--pc, var(--line)); opacity: .18; transition: width .5s linear; }
-.gd-who > :not(.gd-bar) { position: relative; }
+.gd-who::before { content: ""; position: absolute; inset: 0; background: var(--pc, var(--line)); opacity: .18; }
+.gd-who > * { position: relative; }
 .gd-row.is-picked .gd-who { border-color: var(--pc); border-left-width: 12px; box-shadow: 0 0 0 3px var(--pc); }
-.gd-row.is-picked .gd-bar { opacity: .3; }
+.gd-row.is-picked .gd-who::before { opacity: .32; }
 .gd-name { flex: 1; min-width: 0; font-weight: 900; font-size: 19px; overflow-wrap: anywhere; }
 .gd-mins { font-weight: 800; font-size: 18px; font-variant-numeric: tabular-nums; color: var(--ink); }
 .gd-sub { padding: 4px 10px; border-radius: 999px; border: 2px solid var(--pc); background: #fff; font-size: 15px; font-weight: 900; color: var(--ink); }

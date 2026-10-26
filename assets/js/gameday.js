@@ -18,6 +18,8 @@ const GameDay = (() => {
   const MAX_SQUAD = 15;
   const SUB_EVERY = 6;                                   // even split: how often to aim to sub (minutes), unless the coach changes it
   const EVERY_MIN = 2, EVERY_MAX = 12;
+  const STEP = 5;   // everything on the game screen moves in steps of this many seconds, all at the same moment
+                    // (the app's clock can't match the scoreboard exactly anyway: nobody presses them together)
   const LENGTHS = [[2, 18], [2, 20], [4, 8], [4, 10]];   // quick picks: [periods, minutes each]; the first is the default
   // Each girl keeps her own colour, so she's easy to spot in the lists.
   const COLOURS = ['#2563EB', '#DC2626', '#16A34A', '#9333EA', '#F59E0B', '#0891B2', '#DB2777', '#65A30D',
@@ -62,9 +64,10 @@ const GameDay = (() => {
       && [2, 4].includes(g.periods) && g.periodSecs > 0 && g.period >= 1 && g.period <= g.periods
       && g.played && g.share && ['even', 'manual'].includes(g.mode);
     if (!ok) return null;
-    // whole seconds only, so every girl's time ticks over together
-    ['played', 'share'].forEach(k => Object.keys(g[k]).forEach(id => { g[k][id] = Math.round(g[k][id]); }));
-    g.lastCommit = Math.round(g.lastCommit || 0);
+    // whole steps only, so every girl's time ticks over together
+    const step = v => Math.round((v || 0) / STEP) * STEP;
+    ['played', 'share'].forEach(k => Object.keys(g[k]).forEach(id => { g[k][id] = step(g[k][id]); }));
+    g.lastCommit = step(g.lastCommit);
     return g;
   }
   const save = () => { if (game) store.set(KEY_GAME, game); };
@@ -75,15 +78,17 @@ const GameDay = (() => {
   /* ---------- the game timer ---------- */
   const periodWord = g => (g.periods === 2 ? 'Half' : 'Quarter');
   const periodName = (g, n) => `${periodWord(g)} ${n}`;
+  let frozen = null;   // set while drawing, so the whole screen uses one reading of the clock
+  const nowMs = () => (frozen != null ? frozen : Date.now());
   function periodElapsed() {
-    const e = game.elapsed + (game.running ? (Date.now() - game.runStart) / 1000 : 0);
+    const e = game.elapsed + (game.running ? (nowMs() - game.runStart) / 1000 : 0);
     return Math.min(game.periodSecs, Math.max(0, e));
   }
   const clockNow = () => (game.period - 1) * game.periodSecs + periodElapsed();
-  // Everything on screen counts in whole seconds of the game clock, so the
-  // clock, the next-subs countdown and every girl's minutes all tick together.
-  const clockSecs = () => Math.floor(clockNow() + 1e-6);
-  const periodSecsDone = () => Math.floor(periodElapsed() + 1e-6);
+  // The clock, the next-subs countdown and every girl's minutes all count in
+  // whole STEPs of the game clock, so they all change together.
+  const clockSteps = () => Math.floor(clockNow() / STEP + 1e-6) * STEP;
+  const periodStepsDone = () => Math.floor(periodElapsed() / STEP + 1e-6) * STEP;
 
   // Each quarter or half is split into equal stints, as close as possible to
   // how often the coach aims to sub (1 stint = subs at the breaks only).
@@ -91,7 +96,7 @@ const GameDay = (() => {
   const stintSecs = g => g.periodSecs / stintsPer(g.periodSecs / 60, g.subEvery);
   function nextMoment(after) {
     const iv = stintSecs(game);
-    const t = Math.round((Math.floor(after / iv + 1e-6) + 1) * iv);   // on a whole second, like the clock
+    const t = Math.round((Math.floor(after / iv + 1e-6) + 1) * iv / STEP) * STEP;   // on the clock's beat
     return t < game.periodSecs - 1 ? t : null;   // the end of the period is a break, handled on its own
   }
 
@@ -102,7 +107,7 @@ const GameDay = (() => {
   // Credits the time since the last change: minutes to the girls on court,
   // and a fair share to every girl who's here.
   function commit() {
-    const now = clockSecs();
+    const now = clockSteps();
     const dt = now - game.lastCommit;
     game.lastCommit = now;
     if (dt <= 0) return;
@@ -111,7 +116,7 @@ const GameDay = (() => {
     ins.forEach(p => { game.share[p.id] = (game.share[p.id] || 0) + dt * each; });
     game.onCourt.forEach(id => { game.played[id] = (game.played[id] || 0) + dt; });
   }
-  const playedNow = id => (game.played[id] || 0) + (game.onCourt.includes(id) ? Math.max(0, clockSecs() - game.lastCommit) : 0);
+  const playedNow = id => (game.played[id] || 0) + (game.onCourt.includes(id) ? Math.max(0, clockSteps() - game.lastCommit) : 0);
   const owed = id => (game.played[id] || 0) - (game.share[id] || 0);   // below 0 = owed time
 
   // Even split: the girls furthest behind their share go on (on a tie,
@@ -355,6 +360,10 @@ const GameDay = (() => {
   /* ---------- screens ---------- */
   function render() {
     if (!root) return;
+    frozen = Date.now();
+    try { draw(); } finally { frozen = null; }
+  }
+  function draw() {
     if (!live() && !squad.length) screen = 'squad';   // stays on the squad until they tap Done
     if (live()) root.innerHTML = gameHTML();
     else if (screen === 'squad') root.innerHTML = squadHTML();
@@ -500,15 +509,7 @@ const GameDay = (() => {
       <button type="button" class="btn btn-big btn-primary" data-gd="new-game">New game</button>`;
   }
 
-  // How far her minutes bar reaches: full = whoever's played the most so far.
-  function barPct(id) {
-    const most = Math.max(1, ...game.players.map(p => playedNow(p.id)));
-    return Math.round(playedNow(id) / most * 100);
-  }
-
-  // Each girl's row: her colour down the side, and a bar in her colour that
-  // fills with her minutes, so it's easy to see at a glance who's behind.
-  // Tap the row to sub her.
+  // Each girl's row is her colour, so she's easy to spot. Tap it to sub her.
   function rowHTML(p, where) {
     const style = `--pc:${colourOf(p)}`;
     const mins = `<span class="gd-mins" data-min="${esc(p.id)}">${fmt(playedNow(p.id))}</span>`;
@@ -523,7 +524,6 @@ const GameDay = (() => {
     return `
       <li class="gd-row${on ? ' is-picked' : ''}" style="${style}">
         <button type="button" class="gd-who" data-gd="tap" data-id="${esc(p.id)}" aria-pressed="${on}">
-          <span class="gd-bar" data-bar="${esc(p.id)}" style="width:${barPct(p.id)}%"></span>
           <span class="gd-name">${nameHTML(p)}</span>
           ${mins}
           <span class="gd-sub" aria-hidden="true">${on ? 'Picked' : 'Sub'}</span>
@@ -577,7 +577,7 @@ const GameDay = (() => {
     return `
       <div class="card gd-clock-card">
         <p class="eyebrow">${periodName(game, game.period)} of ${game.periods}${game.atBreak ? ' · finished' : ''}</p>
-        <button type="button" class="gd-clock${game.running ? '' : ' is-paused'}" id="gdClock" data-gd="adjust-toggle" aria-label="Time left in the ${periodWord(game).toLowerCase()}. Tap to adjust">${fmt(game.periodSecs - periodSecsDone())}</button>
+        <button type="button" class="gd-clock${game.running ? '' : ' is-paused'}" id="gdClock" data-gd="adjust-toggle" aria-label="Time left in the ${periodWord(game).toLowerCase()}. Tap to adjust">${fmt(game.periodSecs - periodStepsDone())}</button>
         <p class="gd-next" id="gdNext">${nextText()}</p>
         ${adjusting && !game.atBreak ? `<div class="gd-adjust" role="group" aria-label="Adjust the timer">
           ${[-30, -10, 10, 30].map(s => `<button type="button" data-gd="adjust" data-s="${s}">${s > 0 ? '+' : '−'}${Math.abs(s)}s</button>`).join('')}</div>` : ''}
@@ -613,19 +613,22 @@ const GameDay = (() => {
     if (game.atBreak) return game.period + 1 === game.periods ? 'Last one to go' : 'Break';
     if (game.mode !== 'even' || here().length <= COURT) return game.mode === 'even' ? 'Everyone\'s on: no subs needed' : '';
     if (game.due) return 'Subs due now';
-    const left = game.nextSubAt == null ? game.periodSecs - periodSecsDone() : game.nextSubAt - periodSecsDone();
+    const left = game.nextSubAt == null ? game.periodSecs - periodStepsDone() : game.nextSubAt - periodStepsDone();
     return `Next subs in ${fmt(left)}`;
   }
 
-  // Four times a second: just the numbers that change (all from the same whole second).
+  // Four times a second: just the numbers that change (all from the same 5-second step).
   function updateLive() {
     if (!root || !live() || root.closest('[hidden]')) return;
+    frozen = Date.now();
+    try { drawLive(); } finally { frozen = null; }
+  }
+  function drawLive() {
     const clock = $('#gdClock');
     if (!clock) return;
-    clock.textContent = fmt(game.periodSecs - periodSecsDone());
+    clock.textContent = fmt(game.periodSecs - periodStepsDone());
     $('#gdNext').textContent = nextText();
     root.querySelectorAll('[data-min]').forEach(n => { n.textContent = fmt(playedNow(n.dataset.min)); });
-    root.querySelectorAll('[data-bar]').forEach(n => { n.style.width = `${barPct(n.dataset.bar)}%`; });
   }
 
   /* ---------- taps ---------- */

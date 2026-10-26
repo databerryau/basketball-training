@@ -55,8 +55,8 @@ The coach is watching the game, not the phone. Everything has to work at a glanc
 - **The period and the time**: "Quarter 2 · 6:40 left". This is the app's own timer, not the scoreboard.
 - **Pause / Resume**: for breaks, time-outs and long stoppages.
 - **On court**: the 5 girls playing. **Bench**: everyone else. **Hurt or resting**: anyone who can't play right now.
-- **Each girl has her own colour**, kept from game to game: a stripe down the side of her row, and a bar in her colour that fills with her minutes (full = whoever's played most so far), so it's easy to see at a glance who's behind. Her colour is also on the *Subs due* panel, the setup chips and the summary.
-- **Every time ticks together**: the clock, "Next subs in" and every girl's minutes all count in whole seconds of the game clock, so they all change at the same moment.
+- **Each girl has her own colour**, kept from game to game: her whole row is a light wash of it, with a solid stripe down the side, so she's easy to spot. Her colour is also on the *Subs due* panel, the setup chips and the summary.
+- **Every time moves together, in 5-second steps**: the clock, "Next subs in" and every girl's minutes all change at the same moment, every 5 seconds. Sub moments land on the same 5-second beat. (The app's clock can't match the scoreboard to the second anyway, since nobody presses the two at the same moment.)
 - **Each row says Sub**: tap a girl to make a sub (see 4.3).
 - At the end of a quarter or half the timer stops: *"End of quarter 1. Tap Start for quarter 2."*
 
@@ -139,7 +139,7 @@ Built this way; easy to change:
 3. **The app suggests the starting five** in even split; the coach can change it.
 4. **Optional jersey numbers**, alongside first names.
 5. **Fewer than 6 girls**: nobody can sit, so there's nothing to plan. The screen just runs the timer and counts minutes.
-6. **The timer is the app's own.** The coach pauses it for breaks and time-outs, and can tap the time to nudge it if it drifts from the scoreboard.
+6. **The timer is the app's own.** It won't match the scoreboard to the second (nobody starts the two together), so it counts in 5-second steps. The coach pauses it for breaks and time-outs, and can tap the time to nudge it if it drifts a long way.
 7. **A how-to card in Coach help → Game day**, explaining the two modes in a few lines.
 
 ---
@@ -150,7 +150,7 @@ Built this way; easy to change:
 - [x] The squad is saved on the phone; each game the coach ticks who's here, picks the game length and mode, and starts.
 - [x] Even split shows **Subs due** with who's off and on at the right moments, silently, and *Done* swaps them. The coach can also make any sub at any time.
 - [x] At the end of a game played in even split, when setup said "everyone gets the same time", every girl's minutes are within about 2 minutes of each other (when nobody arrived late or got hurt). Otherwise within one stint, as setup warned.
-- [x] Each girl has her own colour and a minutes bar, and every time on screen ticks over together.
+- [x] Each girl's row is her own colour, and every time on screen moves together in 5-second steps.
 - [x] Manual mode swaps any girl with a tap and counts each girl's minutes.
 - [x] Late arrivals and injuries re-balance the rest of the game.
 - [x] Pause, end-of-period stops and reload-safety all work, with the screen kept on.
