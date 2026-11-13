@@ -93,7 +93,12 @@ const GameDay = (() => {
   const stintSecs = g => g.periodSecs / stintsPer(g.periodSecs / 60, g.subEvery);
   function nextMoment(after) {
     const iv = stintSecs(game);
-    const t = Math.round((Math.floor(after / iv + 1e-6) + 1) * iv);   // on a whole second of the clock
+    let k = Math.floor(after / iv + 1e-6) + 1;
+    // On a whole second of the clock. A stint that isn't a whole number of
+    // seconds can round down onto `after` itself (2 × 20 subbing every 3:
+    // 171.4 s rounds to 171), which would ask for subs again straight away.
+    if (Math.round(k * iv) <= after) k++;
+    const t = Math.round(k * iv);
     return t < game.periodSecs - 1 ? t : null;   // the end of the period is a break, handled on its own
   }
 

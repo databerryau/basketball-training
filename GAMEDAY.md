@@ -74,7 +74,7 @@ Everyone gets the same time on court, as near as possible.
   | 4 × 8 | 6 min | at each break only; choose 4 to sub half way through each quarter too |
 
 - **Who goes on**: at each sub moment, the players who've played the **fewest minutes** come on and the players who've played the **most** come off. (Strictly, it's minutes compared with a fair share of the time they've been here, so a late arrival or a player back from a rest gets a fair share of what's left, without the others sitting out to make up their missed time.)
-- **How even it ends up**: when setup shows the green "everyone gets the same time", everyone ends within about 2 minutes of each other (exactly equal if the coach taps *Done* straight away; the rest is time spent waiting for a whistle). Otherwise some players get one more stint than others, which setup warns about. Checked by simulating thousands of games.
+- **How even it ends up**: when setup shows the green "everyone gets the same time", everyone ends within about 2 minutes of each other when each whistle comes within 30 seconds or so (exactly equal if the coach taps *Done* straight away; the rest is time spent waiting for a whistle). Otherwise some players get one more stint than others, which setup warns about. Checked by simulating hundreds of games in `tests/gameday.test.mjs`.
 - **When subs are due**: no sound. The screen changes to a big orange **Subs due** panel:
 
   > **OFF:** Mia, Zoe → **ON:** Ava, Lily

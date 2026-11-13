@@ -239,18 +239,18 @@ A second tab with four short sections. Each is a list of small cards, readable i
 
 ## 9. Done when
 
-- [ ] Opening the page on a phone shows one big **Make today's session** button and a 3-step "how it works".
-- [ ] One tap makes a 60-minute, ten-part session (five 7-minute skill drills, two quick drinks, a 12-minute team game) with a clear focus and the problem it fixes.
-- [ ] Every drill shows a working animated diagram, numbered steps, coaching cues and equipment.
-- [ ] **Swap** changes one drill and keeps the slot's rules.
-- [ ] The session is still there after closing and reopening the page.
-- [ ] **Start session** runs every part with a timer, beeps at zero, shows overtime, and Next/Back work.
-- [ ] Reloading the page during **Start session** carries on at the same part, with the timer where it should be.
-- [ ] The focus doesn't move on when a session is replaced without being run.
-- [ ] After one visit, the page opens with no internet, and it can be added to the home screen.
-- [ ] **Coach help** has all four sections.
+- [x] Opening the page on a phone shows one big **Make today's session** button and a 3-step "how it works".
+- [x] One tap makes a 60-minute, ten-part session (five 7-minute skill drills, two quick drinks, a 12-minute team game) with a clear focus and the problem it fixes.
+- [x] Every drill shows a working animated diagram, numbered steps, coaching cues and equipment.
+- [x] **Swap** changes one drill and keeps the slot's rules.
+- [x] The session is still there after closing and reopening the page.
+- [x] **Start session** runs every part with a timer, beeps at zero, shows overtime, and Next/Back work.
+- [x] Reloading the page during **Start session** carries on at the same part, with the timer where it should be.
+- [x] The focus doesn't move on when a session is replaced without being run.
+- [x] After one visit, the page opens with no internet, and it can be added to the home screen.
+- [x] **Coach help** has all four sections.
 - [ ] No horizontal scrolling at 360px wide, and no console errors.
-- [ ] Published on GitHub Pages.
+- [x] Published on GitHub Pages.
 
 ## 10. Ideas for later
 

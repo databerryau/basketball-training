@@ -21,14 +21,23 @@ The full spec (from the interview) is in [SPEC.md](SPEC.md).
 
 ## Run it locally
 
-It's a static site with no build step and no dependencies:
+It's a static site with no build step and no dependencies. Serve the folder with Python (`py` on Windows, `python3` on a Mac):
 
 ```bash
-python3 -m http.server 8000
-# then open http://localhost:8000/
+py -m http.server 8000
 ```
 
+Then open http://localhost:8000/.
+
 The offline copy (`sw.js`) is switched off on `localhost`, so it can't get in the way of other projects on the same port. To test it, open `http://localhost:8000/?sw`. With it on, a change shows up on the **second** reload, or tick *Update on reload* in the browser's DevTools (Application → Service workers).
+
+## Tests
+
+```bash
+node --test
+```
+
+Node 20 or later, nothing to install. The tests load the app's own scripts with a pretend page and clock, then tap through them like the coach would: they make hundreds of sessions and check them against [SPEC.md](SPEC.md), and play whole games in Game day to check the subs and minutes against [GAMEDAY.md](GAMEDAY.md). They take about 40 seconds.
 
 ## Files
 
@@ -45,6 +54,7 @@ assets/js/help.js      Coach help content
 assets/js/gameday.js   Game day: squad, sub timer, even split and manual subs
 assets/js/app.js       generator, session view, Start session mode
 assets/icons/          home screen icons
+tests/                 node --test checks against the specs (not part of the app)
 ```
 
 ## Adding or changing a drill
