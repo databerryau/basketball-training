@@ -249,11 +249,10 @@ A second tab with four short sections. Each is a list of small cards, readable i
 - [x] The focus doesn't move on when a session is replaced without being run.
 - [x] After one visit, the page opens with no internet, and it can be added to the home screen.
 - [x] **Coach help** has all four sections.
-- [ ] No horizontal scrolling at 360px wide, and no console errors.
+- [x] No horizontal scrolling at 360px wide, and no console errors.
 - [x] Published on GitHub Pages.
 
 ## 10. Ideas for later
-
 
 - Share a session link with an assistant coach.
 - Printable one-page plan.
